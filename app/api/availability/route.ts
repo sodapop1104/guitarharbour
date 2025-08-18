@@ -1,4 +1,3 @@
-// app/api/availability/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { calendarClient } from "../../lib/google";
 import { DateTime, Interval } from "luxon";
@@ -32,10 +31,13 @@ function isTimePeriod(
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
-  const viewerTz = url.searchParams.get("viewerTz") || "America/Los_Angeles";
-  const date = url.searchParams.get("date"); // YYYY-MM-DD
 
-  const day = DateTime.fromISO(date ?? DateTime.now().toISODate(), { zone: viewerTz });
+  // Coalesce to plain strings so TS is happy
+  const viewerTz = url.searchParams.get("viewerTz") || "America/Los_Angeles";
+  // toISODate() is typed as string|null → use toFormat() which is always string
+  const dateParam = url.searchParams.get("date") || DateTime.now().toFormat("yyyy-LL-dd");
+
+  const day = DateTime.fromISO(dateParam, { zone: viewerTz });
   const windowStart = day.startOf("day").toUTC();
   const windowEnd = day.endOf("day").toUTC();
 
