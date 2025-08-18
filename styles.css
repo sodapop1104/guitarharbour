@@ -50,15 +50,6 @@ header {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
-
-/* Make the header span the full width, but keep the nice padding */
-header .container {
-  max-width: none;        /* overrides 1120px */
-  width: 100%;
-  padding-left: clamp(16px, 4vw, 28px);
-  padding-right: clamp(16px, 4vw, 28px);
-}
-
 .nav { display:flex; align-items:center; justify-content:space-between; height:64px; }
 /* no extra padding here anymore — container handles it */
 
@@ -158,3 +149,18 @@ footer { padding: 48px 0; border-top: 1px solid var(--line); color:#777; }
   .reveal, .stagger > * { opacity: 1 !important; transform: none !important; transition: none !important; }
   .track { scroll-behavior: auto !important; }
 }
+
+/* ===== Header: full-width fluid container ===== */
+.container-fluid{
+  max-width: none;               /* ignore the 1120px cap */
+  width: 100%;
+  /* padding that adapts + respects notches (iOS) */
+  padding-left:  calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
+}
+
+/* optional: make sure the sticky header spans the viewport */
+header{ left:0; right:0; }
+
+/* belt & suspenders: no accidental horizontal bleed */
+html, body { overflow-x: hidden; }
