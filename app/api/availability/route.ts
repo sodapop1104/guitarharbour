@@ -11,9 +11,9 @@ const SLOT_MIN = 60; // change to 30 for 30-min slots
 function withinOfficeHours(dtUTC: DateTime) {
   const LA_TZ = process.env.LA_TZ || "America/Los_Angeles";
   const PH_TZ = process.env.PH_TZ || "Asia/Manila";
-  const START = Number(process.env.WORK_START_HOUR || 9); // 09:00
-  const END = Number(process.env.WORK_END_HOUR || 18);    // 18:00
-  const endStart = END - SLOT_MIN / 60; // latest start so it ends by END
+  const START = Number(process.env.WORK_START_HOUR || 9);  // 09:00
+  const END = Number(process.env.WORK_END_HOUR || 18);     // 18:00
+  const endStart = END - SLOT_MIN / 60;                    // latest start so it ends by END
 
   const la = dtUTC.setZone(LA_TZ);
   const ph = dtUTC.setZone(PH_TZ);
@@ -45,16 +45,13 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const calendars = (data.calendars ?? {}) as Record<
-    string,
-    calendar_v3.Schema$FreeBusyCalendar
-  >;
+  const calendars = (data.calendars ?? {}) as Record<string, calendar_v3.Schema$FreeBusyCalendar>;
 
   const timePeriods = Object.values(calendars)
-    .flatMap((c) => c.busy ?? [])
-    .filter((b): b is Required<calendar_v3.Schema$TimePeriod> => !!b.start && !!b.end);
+    .flatMap((c: calendar_v3.Schema$FreeBusyCalendar) => c.busy ?? [])
+    .filter((b: calendar_v3.Schema$TimePeriod | undefined): b is calendar_v3.Schema$TimePeriod => !!b?.start && !!b?.end);
 
-  const busyIntervals: Interval[] = timePeriods.map((b) =>
+  const busyIntervals: Interval[] = timePeriods.map((b: calendar_v3.Schema$TimePeriod) =>
     Interval.fromDateTimes(
       DateTime.fromISO(b.start!, { zone: "utc" }),
       DateTime.fromISO(b.end!, { zone: "utc" })

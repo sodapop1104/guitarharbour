@@ -35,11 +35,8 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const calendars = (fb.data.calendars ?? {}) as Record<
-    string,
-    calendar_v3.Schema$FreeBusyCalendar
-  >;
-  const conflict = Object.values(calendars).some((c) => (c.busy ?? []).length > 0);
+  const calendars = (fb.data.calendars ?? {}) as Record<string, calendar_v3.Schema$FreeBusyCalendar>;
+  const conflict = Object.values(calendars).some((c: calendar_v3.Schema$FreeBusyCalendar) => (c.busy ?? []).length > 0);
   if (conflict) {
     return NextResponse.json({ ok: false, message: "Conflict detected. Approve failed." }, { status: 409 });
   }
