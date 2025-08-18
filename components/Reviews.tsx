@@ -13,7 +13,7 @@ export default function Reviews() {
     const parse = () => window.FB?.XFBML?.parse();
 
     if (document.getElementById('fb-sdk')) {
-      // SDK already present, (re)parse
+      // SDK already present—(re)parse
       parse();
       return;
     }
@@ -24,7 +24,7 @@ export default function Reviews() {
     s.defer = true;
     s.crossOrigin = 'anonymous';
     s.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0';
-    s.onload = parse; // call parse when loaded
+    s.onload = parse;
     document.body.appendChild(s);
   }, []);
 
