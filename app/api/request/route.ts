@@ -64,8 +64,9 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const calendars = (fb.data.calendars ?? {}) as Record<string, calendar_v3.Schema$FreeBusyCalendar>;
-  const isBusy = Object.values(calendars).some((c: calendar_v3.Schema$FreeBusyCalendar) => (c.busy ?? []).length > 0);
+  const calendars: Record<string, calendar_v3.Schema$FreeBusyCalendar> =
+    (fb.data.calendars as Record<string, calendar_v3.Schema$FreeBusyCalendar>) ?? {};
+  const isBusy = Object.values(calendars).some((c) => (c.busy ?? []).length > 0);
   if (isBusy) {
     return NextResponse.json(
       { ok: false, message: "That time was just taken. Please pick another slot." },
