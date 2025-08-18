@@ -6,6 +6,8 @@ import type { calendar_v3 } from "googleapis";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const MEETING_MIN = 30; // ← booking length
+
 function verify(token: string) {
   const [data, sig] = token.split(".");
   const expected = crypto.createHmac("sha256", process.env.APP_SECRET!).update(data).digest("base64url");
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const tz = "UTC";
   const start = new Date(startISO);
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  const end = new Date(start.getTime() + MEETING_MIN * 60 * 1000);
   const cal = calendarClient();
 
   // final conflict check

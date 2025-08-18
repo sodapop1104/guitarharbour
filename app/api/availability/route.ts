@@ -6,19 +6,19 @@ import type { calendar_v3 } from "googleapis";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SLOT_MIN = 60; // change to 30 for 30-min slots
+const SLOT_MIN = 30; // ← 30-minute slots
 
 function withinOfficeHours(dtUTC: import("luxon").DateTime) {
   const LA_TZ = process.env.LA_TZ || "America/Los_Angeles";
   const PH_TZ = process.env.PH_TZ || "Asia/Manila";
   const START = Number(process.env.WORK_START_HOUR || 9);
   const END = Number(process.env.WORK_END_HOUR || 18);
-  const endStart = END - SLOT_MIN / 60;
+  const latestStart = END - SLOT_MIN / 60;
 
   const la = dtUTC.setZone(LA_TZ);
   const ph = dtUTC.setZone(PH_TZ);
-  const laOK = la.hour + la.minute / 60 >= START && la.hour + la.minute / 60 <= endStart;
-  const phOK = ph.hour + ph.minute / 60 >= START && ph.hour + ph.minute / 60 <= endStart;
+  const laOK = la.hour + la.minute / 60 >= START && la.hour + la.minute / 60 <= latestStart;
+  const phOK = ph.hour + ph.minute / 60 >= START && ph.hour + ph.minute / 60 <= latestStart;
 
   return laOK || phOK;
 }
@@ -32,7 +32,7 @@ function isTimePeriod(
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
 
-  // Ensure plain strings (no nulls)
+  // coalesce to plain strings
   const viewerTz = url.searchParams.get("viewerTz") ?? "America/Los_Angeles";
   const dateParam = url.searchParams.get("date") ?? DateTime.now().toFormat("yyyy-LL-dd");
 
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   const windowStart = day.startOf("day").toUTC();
   const windowEnd = day.endOf("day").toUTC();
 
-  // Coalesce to guaranteed ISO strings (Google types require `string`)
+  // guaranteed ISO strings (Google types want string, not string|null)
   const timeMin = windowStart.toISO() ?? windowStart.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'");
   const timeMax = windowEnd.toISO() ?? windowEnd.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'");
 
@@ -77,13 +77,11 @@ export async function GET(req: NextRequest) {
     if (withinOfficeHours(cursor)) {
       const slot = Interval.fromDateTimes(cursor, cursor.plus({ minutes: SLOT_MIN }));
       const overlaps = busyIntervals.some((b) => b.overlaps(slot));
-      if (!overlaps) slots.push(cursor.toISO()!); // safe because cursor is valid
+      if (!overlaps) slots.push(cursor.toISO()!);
     }
     cursor = cursor.plus({ minutes: SLOT_MIN });
   }
 
-  // Use a guaranteed date string for the response
   const dateOut = day.toFormat("yyyy-LL-dd");
-
   return NextResponse.json({ date: dateOut, viewerTz, slotMinutes: SLOT_MIN, slots });
 }

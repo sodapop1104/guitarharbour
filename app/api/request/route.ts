@@ -8,6 +8,8 @@ import type { calendar_v3 } from "googleapis";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const MEETING_MIN = 30; // ← booking length
+
 const schema = z.object({
   startISO: z.string().datetime(),
   name: z.string().min(1),
@@ -24,7 +26,7 @@ function sign(payload: object) {
 
 async function sendMail(to: string, subject: string, html: string) {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
-  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return; // skip email if SMTP not configured
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return;
   const t = nodemailer.createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT || 587),
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   const tz = "UTC";
   const start = new Date(startISO);
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  const end = new Date(start.getTime() + MEETING_MIN * 60 * 1000);
 
   const cal = calendarClient();
 
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
     await sendMail(
       process.env.APPROVER_EMAIL!,
       "New booking request — GuitarHarbour",
-      `<p><b>${name}</b> requested <b>${new Date(startISO).toLocaleString()}</b>.</p>
+      `<p><b>${name}</b> requested <b>${new Date(startISO).toLocaleString()}</b> (${MEETING_MIN} mins).</p>
        <p><a href="${approveUrl}">Approve</a> • <a href="${declineUrl}">Decline</a></p>
        <p>${notes || ""}</p>`
     );
@@ -104,6 +106,5 @@ export async function POST(req: NextRequest) {
     console.error("SMTP failed:", (e as Error).message);
   }
 
-  // return links in dev for quick testing
   return NextResponse.json({ ok: true, approveUrl, declineUrl });
 }
