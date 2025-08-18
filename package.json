@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "googleapis": "^156.0.0",
+    "luxon": "^3.7.1",
     "next": "^15.4.6",
+    "nodemailer": "^7.0.5",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

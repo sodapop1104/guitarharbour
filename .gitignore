@@ -20,6 +20,9 @@ lerna-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env
+.env.*
+!.env.example
 
 # Misc
 .DS_Store
@@ -37,4 +40,4 @@ lerna-debug.log*
 # Optional: Ignore lock files if you want to enforce only one package manager
 # package-lock.json
 # yarn.lock
-# pnpm-lock.yaml
+# pnpm-lock.yamlgi

@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
-    <section className="hero">
+    <section className="hero" id="hero">
       <div className="container">
         <h1 className="reveal" data-anim="up">Shop. Repair. Dialed Tone.</h1>
         <p className="reveal" data-anim="up">
@@ -8,7 +10,9 @@ export default function Hero() {
           All in a minimalist black &amp; white look—because your sound should do the talking.
         </p>
         <div className="hero-cta reveal" data-anim="up">
-          <a className="btn block" href="#contact">Schedule a consultation</a>
+          <Link className="btn block" href="/book" prefetch={false} aria-label="Schedule an online consultation">
+            Schedule an online consultation
+          </Link>
         </div>
       </div>
     </section>
