@@ -25,7 +25,7 @@ if (form && form.action.startsWith('mailto:')) {
   });
 }
 
-// Reveal on scroll
+// Reveal on scroll (header is not using .reveal, so it stays visible)
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!prefersReduced) {
   const io = new IntersectionObserver((entries) => {

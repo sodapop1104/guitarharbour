@@ -10,8 +10,8 @@
   <meta name="theme-color" content="#000000" />
 </head>
 <body>
-  <!-- ===== HEADER ===== -->
-  <header class="reveal" data-anim="down">
+  <!-- HEADER: keep visible while scrolling (no reveal animation) -->
+  <header>
     <div class="nav container-fluid">
       <div class="logo">
         <img src="assets/logo.svg" alt="Guitar Harbour logo" />
@@ -31,16 +31,12 @@
     </div>
   </header>
 
-  <!-- ===== MAIN ===== -->
   <main>
-    <!-- Hero -->
+    <!-- Hero (removed the kicker sentence) -->
     <section class="hero">
       <div class="container">
         <h1 class="reveal" data-anim="up">Shop. Repair. Dialed Tone.</h1>
-        <p class="reveal" data-anim="up">
-          Setups, fretwork, electronics, and clean builds done right. 
-          All in a minimalist black &amp; white look—because your sound should do the talking.
-        </p>
+        <p class="reveal" data-anim="up">Setups, fretwork, electronics, and clean builds done right. All in a minimalist black &amp; white look—because your sound should do the talking.</p>
         <div class="hero-cta reveal" data-anim="up">
           <a class="btn block" href="#contact">Book a Repair</a>
           <a class="btn block" href="tel:+1639604055607">Call / Text (PH)</a>
@@ -84,9 +80,7 @@
             </table>
           </div>
         </div>
-        <p id="price-notes" class="muted reveal" data-anim="up" style="margin-top:8px;">
-          Prices vary by instrument and parts. We’ll confirm a quote after inspection.
-        </p>
+        <p id="price-notes" class="muted reveal" data-anim="up" style="margin-top:8px;">Prices vary by instrument and parts. We’ll confirm a quote after inspection.</p>
       </div>
     </section>
 
@@ -94,9 +88,7 @@
     <section id="shop">
       <div class="container">
         <h2 class="reveal" data-anim="up">Shop</h2>
-        <p class="muted reveal" data-anim="up">
-          Curated new &amp; used gear. <strong>Online shop coming soon.</strong>
-        </p>
+        <p class="muted reveal" data-anim="up">Curated new &amp; used gear. <strong>Online shop coming soon.</strong></p>
         <div class="slider reveal" data-anim="up" aria-label="Featured items carousel">
           <button class="prev" aria-label="Previous">&#10094;</button>
           <div class="track" id="shop-track">
@@ -122,8 +114,8 @@
       </div>
     </section>
 
-    <!-- About -->
-    <section id="about">
+    <!-- About (aligned visually with History) -->
+    <section id="about" class="align-with-above">
       <div class="container two">
         <div class="reveal" data-anim="left">
           <h2>About</h2>
@@ -139,18 +131,30 @@
       </div>
     </section>
 
-    <!-- Contact -->
+    <!-- Contact (form aligned) -->
     <section id="contact">
       <div class="container">
         <h2 class="reveal" data-anim="up">Contact</h2>
         <div class="two">
-          <form class="reveal" data-anim="left" id="contact-form" action="mailto:contact@guitarharbour.com" method="post" enctype="text/plain">
-            <div><label for="name">Name</label><input id="name" name="name" type="text" required placeholder="Your name" /></div>
-            <div><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="you@email.com" /></div>
-            <div><label for="message">Message</label><textarea id="message" name="message" rows="5" required placeholder="Tell us what you need repaired…"></textarea></div>
-            <button class="btn" type="submit">Send</button>
+          <form class="reveal form-grid" data-anim="left" id="contact-form" action="mailto:contact@guitarharbour.com" method="post" enctype="text/plain">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required placeholder="Your name" />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="you@email.com" />
+            </div>
+            <div class="field field-full">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" required placeholder="Tell us what you need repaired…"></textarea>
+            </div>
+            <div class="field field-full">
+              <button class="btn" type="submit">Send</button>
+            </div>
             <p class="muted" style="margin:6px 0 0;">Prefer phone? <a href="tel:+10000000000">+1 (000) 000-0000</a></p>
           </form>
+
           <div class="reveal" data-anim="right">
             <p><strong>Location</strong><br/>[Update street]<br/>[City], [State] [ZIP]</p>
             <p><strong>Hours</strong><br/>Mon–Fri 10–6 • Sat by appt.</p>
@@ -162,7 +166,7 @@
     </section>
   </main>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- FOOTER -->
   <footer>
     <div class="container">
       <div class="divider" style="margin-bottom:18px;"></div>
