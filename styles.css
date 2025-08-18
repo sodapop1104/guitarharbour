@@ -50,6 +50,15 @@ header {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
+
+/* Make the header span the full width, but keep the nice padding */
+header .container {
+  max-width: none;        /* overrides 1120px */
+  width: 100%;
+  padding-left: clamp(16px, 4vw, 28px);
+  padding-right: clamp(16px, 4vw, 28px);
+}
+
 .nav { display:flex; align-items:center; justify-content:space-between; height:64px; }
 /* no extra padding here anymore — container handles it */
 
