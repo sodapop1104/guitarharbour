@@ -1,7 +1,7 @@
+// app/api/availability/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { calendarClient } from "../../lib/google";
 import { DateTime, Interval } from "luxon";
-import type { DateTime as LuxonDateTime } from "luxon";
 import type { calendar_v3 } from "googleapis";
 
 export const runtime = "nodejs";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const SLOT_MIN = 60; // change to 30 for 30-min slots
 
-function withinOfficeHours(dtUTC: LuxonDateTime) {
+function withinOfficeHours(dtUTC: import("luxon").DateTime) {
   const LA_TZ = process.env.LA_TZ || "America/Los_Angeles";
   const PH_TZ = process.env.PH_TZ || "Asia/Manila";
   const START = Number(process.env.WORK_START_HOUR || 9);
