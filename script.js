@@ -1,7 +1,7 @@
 // Mobile nav toggle
 const toggle = document.querySelector('.nav-toggle');
 const menu = document.getElementById('menu');
-if (toggle) {
+if (toggle && menu) {
   toggle.addEventListener('click', () => {
     const open = menu.classList.toggle('open');
     toggle.setAttribute('aria-expanded', String(open));
@@ -9,9 +9,10 @@ if (toggle) {
 }
 
 // Footer year
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearEl = document.getElementById('year');
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// Contact mailto prefill
+// Contact mailto prefill (keep UX nice)
 const form = document.getElementById('contact-form');
 if (form && form.action.startsWith('mailto:')) {
   form.addEventListener('submit', (e) => {
@@ -25,7 +26,7 @@ if (form && form.action.startsWith('mailto:')) {
   });
 }
 
-// Reveal on scroll (header is not using .reveal, so it stays visible)
+// Reveal on scroll (header not animated so it always stays visible)
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!prefersReduced) {
   const io = new IntersectionObserver((entries) => {

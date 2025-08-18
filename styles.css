@@ -1,5 +1,6 @@
 :root { --bg:#000; --fg:#fff; --muted:#999; --line:#111; }
 
+/* base */
 html { scroll-behavior: smooth; }
 * { box-sizing: border-box; }
 html, body { width:100%; overflow-x:hidden; }
@@ -13,7 +14,7 @@ body {
 a { color: var(--fg); text-decoration: none; }
 img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
 
-/* Page container (used by sections) */
+/* containers */
 .container {
   max-width: 1120px;
   width: 100%;
@@ -21,8 +22,13 @@ img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
   padding-left: clamp(16px, 4vw, 28px);
   padding-right: clamp(16px, 4vw, 28px);
 }
+.container-fluid {
+  max-width:none; width:100%;
+  padding-left: clamp(16px, 4vw, 32px);
+  padding-right: clamp(16px, 4vw, 32px);
+}
 
-/* ===== Buttons ===== */
+/* buttons */
 .btn {
   display:inline-block;
   padding: clamp(12px, 2.8vw, 14px) clamp(16px, 3.2vw, 20px);
@@ -38,22 +44,15 @@ img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
 .muted { color:var(--muted); }
 .divider { height:1px; background: var(--line); }
 
-/* ===== Header / Nav ===== */
+/* header / nav */
 header {
   position: sticky; top:0; left:0; right:0;
   backdrop-filter: blur(6px);
-  background: rgba(0,0,0,.8);            /* slightly more opaque so it stays visible */
+  background: rgba(0,0,0,.8);
   border-bottom: 1px solid var(--line);
-  z-index: 100;                           /* on top of content */
+  z-index: 100;
 }
-.nav {
-  display:flex; align-items:center; justify-content:space-between; height:64px;
-}
-.container-fluid {
-  max-width:none; width:100%;
-  padding-left: clamp(16px, 4vw, 32px);
-  padding-right: clamp(16px, 4vw, 32px);
-}
+.nav { display:flex; align-items:center; justify-content:space-between; height:64px; }
 .logo { display:flex; align-items:center; gap:12px; min-width: 0; }
 .logo img { height:28px; width:auto; }
 nav ul { display:flex; gap: clamp(12px, 2.5vw, 20px); list-style:none; padding:0; margin:0; }
@@ -74,7 +73,7 @@ nav a:hover { opacity:1; }
   .btn.nav-contact { width:100%; text-align:center; }
 }
 
-/* ===== Hero ===== */
+/* hero */
 .hero {
   padding: clamp(72px, 12vw, 108px) 0 clamp(56px, 8vw, 84px);
   background: radial-gradient(1200px 500px at 70% -10%, #111 0%, #000 60%);
@@ -85,14 +84,14 @@ nav a:hover { opacity:1; }
 .hero-cta { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; max-width: 520px; }
 @media (min-width: 640px){ .hero-cta { display:flex; max-width:none; } }
 
-/* ===== Sections ===== */
+/* sections */
 section { padding: clamp(56px, 8vw, 80px) 0; }
 h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em; text-transform: uppercase; }
 
-/* Align About with History (slightly reduce top padding if needed on some screens) */
+/* align about with history rhythm */
 #about.align-with-above { padding-top: clamp(48px, 7vw, 72px); }
 
-/* ===== Services grid ===== */
+/* services grid */
 .grid { display:grid; gap:16px; grid-template-columns: repeat(12, 1fr); }
 .card { grid-column: span 12; border:1px solid var(--line); background: #050505; padding: clamp(14px, 2.4vw, 18px); border-radius: 16px; }
 @media (min-width: 620px){ .card { grid-column: span 6; } }
@@ -100,7 +99,7 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
 .card h3 { margin:0 0 8px; font-size: clamp(16px, 2.8vw, 18px); text-transform: uppercase; letter-spacing:.06em; }
 .card p { color:#aaa; margin:0; }
 
-/* ===== Slider (Shop) ===== */
+/* slider */
 .slider { position: relative; }
 .track { display:flex; overflow: auto; scroll-snap-type: x mandatory; gap: 16px; -webkit-overflow-scrolling: touch; }
 .slide { min-width: 80%; scroll-snap-align: start; border:1px solid var(--line); background:#050505; border-radius:16px; padding:18px; }
@@ -109,7 +108,7 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
 .slider .prev { left: 6px; }
 .slider .next { right: 6px; }
 
-/* ===== Pricing ===== */
+/* pricing */
 .pricing { border:1px solid var(--line); border-radius: 16px; overflow:hidden; }
 .table-wrap { width:100%; overflow-x:auto; -webkit-overflow-scrolling: touch; }
 .pricing table { min-width:560px; width:100%; border-collapse: collapse; }
@@ -117,19 +116,15 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
 .pricing th { text-align:left; font-weight:700; text-transform: uppercase; letter-spacing:.06em; }
 .pricing tr:last-child td { border-bottom: 0; }
 
-/* ===== Two-col sections ===== */
+/* two-column sections */
 .two { display:grid; grid-template-columns: 1fr; gap:24px; }
 @media (min-width: 900px){ .two { grid-template-columns: 1.2fr .8fr; } }
 blockquote { border-left: 3px solid #222; padding: 12px 16px; margin: 0; color:#bbb; }
 
-/* ===== Contact Form alignment ===== */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 16px;
-}
+/* contact form alignment */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
 .field { display: flex; flex-direction: column; }
-.field-full { grid-column: 1 / -1; }  /* message + button span full width */
+.field-full { grid-column: 1 / -1; }
 label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
 input, textarea {
   width: 100%;
@@ -141,15 +136,22 @@ input, textarea {
   font: inherit;
 }
 textarea { resize: vertical; min-height: 140px; }
+@media (max-width: 700px){ .form-grid { grid-template-columns: 1fr; } }
 
-@media (max-width: 700px){
-  .form-grid { grid-template-columns: 1fr; }
+/* fb reviews card */
+.embed-card {
+  border:1px solid var(--line);
+  background:#050505;
+  border-radius:16px;
+  padding:14px;
+  overflow:hidden;
 }
+.embed-card > .fb-page { width:100%; }
 
-/* ===== Footer ===== */
+/* footer */
 footer { padding: 48px 0; border-top: 1px solid var(--line); color:#777; }
 
-/* ===== Animations (kept for sections; header excluded so it never hides) ===== */
+/* animations (header excluded so it never hides) */
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.in { opacity: 1; transform: none; }
 .reveal[data-anim="left"] { transform: translateX(-28px); }

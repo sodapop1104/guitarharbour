@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Guitar Harbour — Shop &amp; Repair</title>
-  <meta name="description" content="Black & white guitar shop and repair. Setups, fretwork, electronics, custom builds. Clean, fast, precise." />
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
-  <meta name="theme-color" content="#000000" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Guitar Harbour — Shop & Repair</title>
+  <meta name="description" content="Black & white guitar shop and repair. Setups, fretwork, electronics, custom builds. Clean, fast, precise.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#000000">
 </head>
 <body>
-  <!-- HEADER: keep visible while scrolling (no reveal animation) -->
+  <!-- HEADER (sticky, full-width) -->
   <header>
     <div class="nav container-fluid">
       <div class="logo">
-        <img src="assets/logo.svg" alt="Guitar Harbour logo" />
+        <img src="assets/logo.svg" alt="Guitar Harbour logo">
         <strong>Guitar Harbour</strong>
       </div>
       <nav aria-label="Primary">
@@ -32,11 +32,14 @@
   </header>
 
   <main>
-    <!-- Hero (removed the kicker sentence) -->
+    <!-- HERO (removed the “Black & White // No Noise” kicker) -->
     <section class="hero">
       <div class="container">
         <h1 class="reveal" data-anim="up">Shop. Repair. Dialed Tone.</h1>
-        <p class="reveal" data-anim="up">Setups, fretwork, electronics, and clean builds done right. All in a minimalist black &amp; white look—because your sound should do the talking.</p>
+        <p class="reveal" data-anim="up">
+          Setups, fretwork, electronics, and clean builds done right. 
+          All in a minimalist black &amp; white look—because your sound should do the talking.
+        </p>
         <div class="hero-cta reveal" data-anim="up">
           <a class="btn block" href="#contact">Book a Repair</a>
           <a class="btn block" href="tel:+1639604055607">Call / Text (PH)</a>
@@ -45,7 +48,7 @@
       </div>
     </section>
 
-    <!-- Services -->
+    <!-- SERVICES -->
     <section id="services">
       <div class="container">
         <h2 class="reveal" data-anim="up">Services</h2>
@@ -60,7 +63,7 @@
       </div>
     </section>
 
-    <!-- Repairs -->
+    <!-- REPAIRS -->
     <section id="repairs">
       <div class="container">
         <h2 class="reveal" data-anim="up">Repairs &amp; Pricing</h2>
@@ -80,16 +83,17 @@
             </table>
           </div>
         </div>
-        <p id="price-notes" class="muted reveal" data-anim="up" style="margin-top:8px;">Prices vary by instrument and parts. We’ll confirm a quote after inspection.</p>
+        <p id="price-notes" class="muted reveal" data-anim="up" style="margin-top:8px">Prices vary by instrument and parts. We’ll confirm a quote after inspection.</p>
       </div>
     </section>
 
-    <!-- Shop -->
+    <!-- SHOP (slider announced as a region for screen readers) -->
     <section id="shop">
       <div class="container">
         <h2 class="reveal" data-anim="up">Shop</h2>
         <p class="muted reveal" data-anim="up">Curated new &amp; used gear. <strong>Online shop coming soon.</strong></p>
-        <div class="slider reveal" data-anim="up" aria-label="Featured items carousel">
+
+        <div class="slider reveal" data-anim="up" role="region" aria-label="Featured items">
           <button class="prev" aria-label="Previous">&#10094;</button>
           <div class="track" id="shop-track">
             <article class="slide"><h3>Strat-Style Build</h3><p>Modern C neck, alnico V pickups.</p></article>
@@ -102,7 +106,7 @@
       </div>
     </section>
 
-    <!-- History -->
+    <!-- HISTORY -->
     <section id="history">
       <div class="container">
         <h2 class="reveal" data-anim="up">History</h2>
@@ -114,7 +118,7 @@
       </div>
     </section>
 
-    <!-- About (aligned visually with History) -->
+    <!-- ABOUT (aligned visually with History) + REVIEWS (Facebook) -->
     <section id="about" class="align-with-above">
       <div class="container two">
         <div class="reveal" data-anim="left">
@@ -122,16 +126,27 @@
           <p>Guitar Harbour is a small, detail-first workshop. We tune out the noise and focus on precision—so your guitar plays fast, stays in tune, and sounds fierce.</p>
           <p class="muted">Founded 2025 • Independently owned • Built on honest work</p>
         </div>
+
         <div class="reveal" data-anim="right">
-          <h2>Testimonials</h2>
-          <blockquote>“My Tele has never played this slick. Setup is 💯.” — A.M.</blockquote>
-          <br />
-          <blockquote>“Fret buzz gone, action low, tone tight. Instant main.” — L.G.</blockquote>
+          <h2>Reviews</h2>
+          <div class="embed-card">
+            <div class="fb-page"
+              data-href="https://www.facebook.com/search/top?q=guitar%20harbour%20custom%20shop"
+              data-tabs="reviews"
+              data-width=""
+              data-height=""
+              data-small-header="false"
+              data-adapt-container-width="true"
+              data-hide-cover="false"
+              data-show-facepile="true">
+            </div>
+          </div>
+          <p class="muted" style="margin-top:12px">If reviews don’t load, <a href="https://www.facebook.com/search/top?q=guitar%20harbour%20custom%20shop" target="_blank" rel="noopener">see them on Facebook</a>.</p>
         </div>
       </div>
     </section>
 
-    <!-- Contact (form aligned) -->
+    <!-- CONTACT -->
     <section id="contact">
       <div class="container">
         <h2 class="reveal" data-anim="up">Contact</h2>
@@ -139,11 +154,11 @@
           <form class="reveal form-grid" data-anim="left" id="contact-form" action="mailto:contact@guitarharbour.com" method="post" enctype="text/plain">
             <div class="field">
               <label for="name">Name</label>
-              <input id="name" name="name" type="text" required placeholder="Your name" />
+              <input id="name" name="name" type="text" required placeholder="Your name">
             </div>
             <div class="field">
               <label for="email">Email</label>
-              <input id="email" name="email" type="email" required placeholder="you@email.com" />
+              <input id="email" name="email" type="email" required placeholder="you@email.com">
             </div>
             <div class="field field-full">
               <label for="message">Message</label>
@@ -152,14 +167,14 @@
             <div class="field field-full">
               <button class="btn" type="submit">Send</button>
             </div>
-            <p class="muted" style="margin:6px 0 0;">Prefer phone? <a href="tel:+10000000000">+1 (000) 000-0000</a></p>
+            <p class="muted" style="margin:6px 0 0">Prefer phone? <a href="tel:+10000000000">+1 (000) 000-0000</a></p>
           </form>
 
           <div class="reveal" data-anim="right">
-            <p><strong>Location</strong><br/>[Update street]<br/>[City], [State] [ZIP]</p>
-            <p><strong>Hours</strong><br/>Mon–Fri 10–6 • Sat by appt.</p>
-            <p><strong>Email</strong><br/><a href="mailto:contact@guitarharbour.com">contact@guitarharbour.com</a></p>
-            <p><strong>Social</strong><br/><a href="#">Instagram</a> · <a href="#">YouTube</a></p>
+            <p><strong>Location</strong><br>[Update street]<br>[City], [State] [ZIP]</p>
+            <p><strong>Hours</strong><br>Mon–Fri 10–6 • Sat by appt.</p>
+            <p><strong>Email</strong><br><a href="mailto:contact@guitarharbour.com">contact@guitarharbour.com</a></p>
+            <p><strong>Social</strong><br><a href="#">Instagram</a> · <a href="#">YouTube</a></p>
           </div>
         </div>
       </div>
@@ -169,14 +184,19 @@
   <!-- FOOTER -->
   <footer>
     <div class="container">
-      <div class="divider" style="margin-bottom:18px;"></div>
-      <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <div class="divider" style="margin-bottom:18px"></div>
+      <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap">
         <span>&copy; <span id="year"></span> Guitar Harbour</span>
         <span class="muted">guitarharbour.com</span>
       </div>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Facebook SDK (required for the reviews embed) -->
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0"></script>
+
+  <!-- Your JS (deferred) -->
+  <script src="script.js" defer></script>
 </body>
 </html>
