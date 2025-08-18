@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calendarClient } from "../../lib/google";
 import { DateTime, Interval } from "luxon";
+import type { calendar_v3 } from "googleapis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -44,15 +45,21 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const busyIntervals: Interval[] = Object
-    .values(data.calendars ?? {})
-    .flatMap((c: any) => c.busy ?? [])
-    .map((b: any) =>
-      Interval.fromDateTimes(
-        DateTime.fromISO(b.start, { zone: "utc" }),
-        DateTime.fromISO(b.end, { zone: "utc" })
-      )
-    );
+  const calendars = (data.calendars ?? {}) as Record<
+    string,
+    calendar_v3.Schema$FreeBusyCalendar
+  >;
+
+  const timePeriods = Object.values(calendars)
+    .flatMap((c) => c.busy ?? [])
+    .filter((b): b is Required<calendar_v3.Schema$TimePeriod> => !!b.start && !!b.end);
+
+  const busyIntervals: Interval[] = timePeriods.map((b) =>
+    Interval.fromDateTimes(
+      DateTime.fromISO(b.start!, { zone: "utc" }),
+      DateTime.fromISO(b.end!, { zone: "utc" })
+    )
+  );
 
   const slots: string[] = [];
   let cursor = windowStart;

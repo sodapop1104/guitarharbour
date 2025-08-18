@@ -3,6 +3,7 @@ import { calendarClient } from "../../lib/google";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { z } from "zod";
+import type { calendar_v3 } from "googleapis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,10 +24,7 @@ function sign(payload: object) {
 
 async function sendMail(to: string, subject: string, html: string) {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
-  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-    console.warn("SMTP not configured; skipping email send.");
-    return;
-  }
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return; // skip email if SMTP not configured
   const t = nodemailer.createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT || 587),
@@ -38,7 +36,14 @@ async function sendMail(to: string, subject: string, html: string) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { startISO, name, email, notes } = schema.parse(body);
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { ok: false, errors: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  const { startISO, name, email, notes } = parsed.data;
 
   const tz = "UTC";
   const start = new Date(startISO);
@@ -46,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   const cal = calendarClient();
 
-  // Re-check availability at request time
+  // conflict check against Main + Holds
   const fb = await cal.freebusy.query({
     requestBody: {
       timeMin: start.toISOString(),
@@ -58,12 +63,20 @@ export async function POST(req: NextRequest) {
       ],
     },
   });
-  const isBusy = Object.values(fb.data.calendars ?? {}).some((c: any) => (c.busy ?? []).length > 0);
+
+  const calendars = (fb.data.calendars ?? {}) as Record<
+    string,
+    calendar_v3.Schema$FreeBusyCalendar
+  >;
+  const isBusy = Object.values(calendars).some((c) => (c.busy ?? []).length > 0);
   if (isBusy) {
-    return NextResponse.json({ ok: false, message: "That time was just taken. Please pick another slot." }, { status: 409 });
+    return NextResponse.json(
+      { ok: false, message: "That time was just taken. Please pick another slot." },
+      { status: 409 }
+    );
   }
 
-  // Create a private hold event (no attendees)
+  // create HOLD (no attendees)
   const hold = await cal.events.insert({
     calendarId: process.env.HOLDS_CALENDAR_ID!,
     requestBody: {
@@ -72,7 +85,7 @@ export async function POST(req: NextRequest) {
       start: { dateTime: start.toISOString(), timeZone: tz },
       end: { dateTime: end.toISOString(), timeZone: tz },
       visibility: "private",
-      transparency: "opaque", // blocks time
+      transparency: "opaque",
       extendedProperties: { private: { requesterEmail: email } },
     },
   });
@@ -81,18 +94,19 @@ export async function POST(req: NextRequest) {
   const approveUrl = `${process.env.SITE_URL}/api/approve?token=${token}`;
   const declineUrl = `${process.env.SITE_URL}/api/decline?token=${token}`;
 
-  await sendMail(
-    process.env.APPROVER_EMAIL!,
-    "New booking request — GuitarHarbour",
-    `<p><b>${name}</b> requested <b>${new Date(startISO).toLocaleString()}</b>.</p>
-     <p><a href="${approveUrl}">Approve</a> • <a href="${declineUrl}">Decline</a></p>
-     <p>${notes || ""}</p>`
-  );
-
-  // In dev, also return the links (handy if SMTP not set yet)
-  if (process.env.NODE_ENV !== "production") {
-    return NextResponse.json({ ok: true, approveUrl, declineUrl });
+  // email approver (best-effort in dev)
+  try {
+    await sendMail(
+      process.env.APPROVER_EMAIL!,
+      "New booking request — GuitarHarbour",
+      `<p><b>${name}</b> requested <b>${new Date(startISO).toLocaleString()}</b>.</p>
+       <p><a href="${approveUrl}">Approve</a> • <a href="${declineUrl}">Decline</a></p>
+       <p>${notes || ""}</p>`
+    );
+  } catch (e) {
+    console.error("SMTP failed:", (e as Error).message);
   }
 
-  return NextResponse.json({ ok: true });
+  // return links in dev for quick testing
+  return NextResponse.json({ ok: true, approveUrl, declineUrl });
 }

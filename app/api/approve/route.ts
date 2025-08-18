@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calendarClient } from "../../lib/google";
 import crypto from "crypto";
+import type { calendar_v3 } from "googleapis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
   const end = new Date(start.getTime() + 60 * 60 * 1000);
   const cal = calendarClient();
 
-  // Final conflict check
+  // final conflict check
   const fb = await cal.freebusy.query({
     requestBody: {
       timeMin: start.toISOString(),
@@ -33,12 +34,17 @@ export async function GET(req: NextRequest) {
       items: [{ id: process.env.MAIN_CALENDAR_ID! }],
     },
   });
-  const conflict = Object.values(fb.data.calendars ?? {}).some((c: any) => (c.busy ?? []).length > 0);
+
+  const calendars = (fb.data.calendars ?? {}) as Record<
+    string,
+    calendar_v3.Schema$FreeBusyCalendar
+  >;
+  const conflict = Object.values(calendars).some((c) => (c.busy ?? []).length > 0);
   if (conflict) {
     return NextResponse.json({ ok: false, message: "Conflict detected. Approve failed." }, { status: 409 });
   }
 
-  // Create real event on main calendar, invite client
+  // create confirmed event on main calendar
   await cal.events.insert({
     calendarId: process.env.MAIN_CALENDAR_ID!,
     requestBody: {
@@ -53,7 +59,7 @@ export async function GET(req: NextRequest) {
     sendUpdates: "all",
   });
 
-  // Delete the hold
+  // delete the hold
   await cal.events.delete({ calendarId: process.env.HOLDS_CALENDAR_ID!, eventId: holdEventId });
 
   return NextResponse.redirect(`${process.env.SITE_URL}/approved`);
