@@ -32,20 +32,23 @@ function isTimePeriod(
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
 
-  // Coalesce to plain strings so TS is happy
-  const viewerTz = url.searchParams.get("viewerTz") || "America/Los_Angeles";
-  // toISODate() is typed as string|null → use toFormat() which is always string
-  const dateParam = url.searchParams.get("date") || DateTime.now().toFormat("yyyy-LL-dd");
+  // Ensure plain strings (no nulls)
+  const viewerTz = url.searchParams.get("viewerTz") ?? "America/Los_Angeles";
+  const dateParam = url.searchParams.get("date") ?? DateTime.now().toFormat("yyyy-LL-dd");
 
   const day = DateTime.fromISO(dateParam, { zone: viewerTz });
   const windowStart = day.startOf("day").toUTC();
   const windowEnd = day.endOf("day").toUTC();
 
+  // Coalesce to guaranteed ISO strings (Google types require `string`)
+  const timeMin = windowStart.toISO() ?? windowStart.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'");
+  const timeMax = windowEnd.toISO() ?? windowEnd.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'");
+
   const cal = calendarClient();
   const { data } = await cal.freebusy.query({
     requestBody: {
-      timeMin: windowStart.toISO(),
-      timeMax: windowEnd.toISO(),
+      timeMin,
+      timeMax,
       timeZone: "UTC",
       items: [
         { id: process.env.MAIN_CALENDAR_ID! },
@@ -74,10 +77,13 @@ export async function GET(req: NextRequest) {
     if (withinOfficeHours(cursor)) {
       const slot = Interval.fromDateTimes(cursor, cursor.plus({ minutes: SLOT_MIN }));
       const overlaps = busyIntervals.some((b) => b.overlaps(slot));
-      if (!overlaps) slots.push(cursor.toISO());
+      if (!overlaps) slots.push(cursor.toISO()!); // safe because cursor is valid
     }
     cursor = cursor.plus({ minutes: SLOT_MIN });
   }
 
-  return NextResponse.json({ date: day.toISODate(), viewerTz, slotMinutes: SLOT_MIN, slots });
+  // Use a guaranteed date string for the response
+  const dateOut = day.toFormat("yyyy-LL-dd");
+
+  return NextResponse.json({ date: dateOut, viewerTz, slotMinutes: SLOT_MIN, slots });
 }
