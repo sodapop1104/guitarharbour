@@ -3,18 +3,20 @@ import { useState } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { FaFacebook, FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 
+type SubmitState = "idle" | "sending" | "success" | "error";
+
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<SubmitState>("idle");
+  const [serverMsg, setServerMsg] = useState<string>("");
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\-\.]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
     setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Real-time validation
     if (name === "name") {
       setErrors(prev => ({ ...prev, name: value.trim() ? "" : "Please enter your name." }));
     } else if (name === "email") {
@@ -26,14 +28,47 @@ export default function Contact() {
     }
   };
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Final check before submit
-    if (errors.name || errors.email || errors.message || !formData.name || !formData.email || !formData.message) return;
 
-    const subject = encodeURIComponent("Guitar Harbour Repair Inquiry");
-    const body = `From: ${formData.name} <${formData.email}>%0D%0A%0D%0A${formData.message}`;
-    window.location.href = `mailto:contact@guitarharbour.com?subject=${subject}&body=${body}`;
+    // final client-side guard
+    const nextErrors = {
+      name: formData.name.trim() ? "" : "Please enter your name.",
+      email: !formData.email.trim()
+        ? "Please enter your email."
+        : emailRegex.test(formData.email)
+        ? ""
+        : "Please enter a valid email address.",
+      message: formData.message.trim() ? "" : "Please enter a message.",
+    };
+    setErrors(nextErrors);
+    if (nextErrors.name || nextErrors.email || nextErrors.message) return;
+
+    try {
+      setStatus("sending");
+      setServerMsg("");
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          message: formData.message.trim(),
+        }),
+      });
+
+      const data: { ok?: boolean; message?: string } = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.message || "Something went wrong.");
+
+      setStatus("success");
+      setServerMsg("Thanks! Your message has been sent. We'll get back to you soon.");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err: unknown) {
+      setStatus("error");
+      setServerMsg(err instanceof Error ? err.message : "Unable to send right now. Please try again.");
+    } finally {
+      setTimeout(() => setStatus("idle"), 3000); // softly reset state
+    }
   };
 
   return (
@@ -43,48 +78,49 @@ export default function Contact() {
 
         <div className="two">
           {/* Contact Form */}
-          <form className="reveal form-grid" data-anim="left" onSubmit={submit} noValidate>
+          <form className="reveal form-grid" data-anim="left" onSubmit={handleSubmit} noValidate>
             <div className="field">
               <label htmlFor="name">Name</label>
               <input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Your name"
-                value={formData.name}
-                onChange={handleChange}
+                id="name" name="name" type="text" placeholder="Your name"
+                value={formData.name} onChange={handleChange} autoComplete="name"
+                aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-err" : undefined}
               />
-              {errors.name && <p className="error">{errors.name}</p>}
+              {errors.name && <p id="name-err" className="error">{errors.name}</p>}
             </div>
 
             <div className="field">
               <label htmlFor="email">Email</label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@email.com"
-                value={formData.email}
-                onChange={handleChange}
+                id="email" name="email" type="email" placeholder="you@email.com"
+                value={formData.email} onChange={handleChange} autoComplete="email"
+                aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-err" : undefined}
+                pattern="^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\-\.]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$"
+                title="Enter a valid email address"
               />
-              {errors.email && <p className="error">{errors.email}</p>}
+              {errors.email && <p id="email-err" className="error">{errors.email}</p>}
             </div>
 
             <div className="field field-full">
               <label htmlFor="message">Message</label>
               <textarea
-                id="message"
-                name="message"
-                rows={6}
+                id="message" name="message" rows={6}
                 placeholder="Please tell us what you need..."
-                value={formData.message}
-                onChange={handleChange}
+                value={formData.message} onChange={handleChange}
+                aria-invalid={!!errors.message} aria-describedby={errors.message ? "msg-err" : undefined}
               />
-              {errors.message && <p className="error">{errors.message}</p>}
+              {errors.message && <p id="msg-err" className="error">{errors.message}</p>}
             </div>
 
             <div className="field field-full">
-              <button className="btn" type="submit">Send</button>
+              <button className="btn" type="submit" disabled={status === "sending"}>
+                {status === "sending" ? "Sending…" : "Send"}
+              </button>
+              {serverMsg && (
+                <p className="muted" style={{ marginTop: 8, color: status === "error" ? "#ff4d4f" : "var(--muted)" }}>
+                  {serverMsg}
+                </p>
+              )}
             </div>
 
             {/* Phone Numbers */}
@@ -99,47 +135,15 @@ export default function Contact() {
           <div className="reveal" data-anim="right" aria-label="Shop details">
             <p><strong>Location</strong><br />Based in Temple City, California, we serve musicians across the San Gabriel Valley and nearby areas. Our pickup-and-delivery service handles expert guitar repairs, setups, and modifications — we collect your instrument, care for it, and return it ready to play.</p>
             <p><strong>Hours</strong><br />Mon–Fri 9AM–6PM • Sat by appt. only</p>
-            <p><strong>Email</strong><br /><a href="mailto:contact@guitarharbour.com">contact@guitarharbour.com</a></p>
+            <p><strong>Email</strong><br /><span>contact@guitarharbour.com</span></p> {/* plain text so it won't open mail app */}
 
             {/* Social Buttons */}
             <p><strong>Social</strong></p>
             <div className="social-buttons">
-              <a
-                href="https://www.facebook.com/GuitarHarbourPH"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="social-btn facebook"
-              >
-                <FaFacebook /> Facebook
-              </a>
-              <a
-                href="https://www.instagram.com/guitarharbourmanila/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="social-btn instagram"
-              >
-                <FaInstagram /> Instagram
-              </a>
-              <a
-                href="https://www.youtube.com/@bimbocanayon2308"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="social-btn youtube"
-              >
-                <FaYoutube /> YouTube
-              </a>
-              <a
-                href="https://www.tiktok.com/@guitarharbourcustomshop"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className="social-btn tiktok"
-              >
-                <FaTiktok /> TikTok
-              </a>
+              <a href="https://www.facebook.com/GuitarHarbourPH" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn facebook"><FaFacebook /> Facebook</a>
+              <a href="https://www.instagram.com/guitarharbourmanila/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-btn instagram"><FaInstagram /> Instagram</a>
+              <a href="https://www.youtube.com/@bimbocanayon2308" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="social-btn youtube"><FaYoutube /> YouTube</a>
+              <a href="https://www.tiktok.com/@guitarharbourcustomshop" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="social-btn tiktok"><FaTiktok /> TikTok</a>
             </div>
           </div>
         </div>
