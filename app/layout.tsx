@@ -3,7 +3,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import ThemeProvider from "@/components/ThemeProvider";
 import RevealManager from "@/components/RevealManager";
-import ConsentBanner from "@/components/ConsentBanner"; // ← added
+import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Guitar Harbour",
@@ -36,9 +37,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <RevealManager />
           {children}
-          {/* Non-essential cookies consent (no analytics loader used) */}
-          <ConsentBanner />
         </ThemeProvider>
+
+        {/* Vercel Speed Insights (performance metrics) */}
+        <SpeedInsights />
+
+        {/* Vercel Web Analytics (traffic) – drop events if user opted out */}
+        <Analytics
+          // debug messages show in dev by default; uncomment to silence:
+          // debug={false}
+          beforeSend={(event: BeforeSendEvent) => {
+            if (typeof document !== "undefined" && document.cookie.includes("gh_optout=1")) {
+              return null; // don't send analytics if opted out
+            }
+            return event;
+          }}
+        />
       </body>
     </html>
   );
