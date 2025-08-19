@@ -156,7 +156,7 @@ export default function Page() {
                 aria-describedby={emailError ? 'email-error' : undefined}
                 autoComplete="email"
                 inputMode="email"
-                pattern="^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\-\.]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$"
+                pattern="^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\\-\\.]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
                 title="Enter a valid email address"
               />
             </label>
@@ -175,6 +175,14 @@ export default function Page() {
             </label>
           </div>
         </div>
+
+        {/* Notice at collection (CPRA) */}
+        <p style={{ fontSize: 12, color: '#7a7a7a', marginTop: 6, lineHeight: 1.4 }}>
+          We collect your name, email, and booking notes to schedule your consultation and communicate about your request.
+          We retain this information only as long as needed to provide the service. See our{" "}
+          <a href="/privacy">Privacy Policy</a>. To opt out of sale/sharing, visit{" "}
+          <a href="/do-not-sell">Do Not Sell or Share My Personal Information</a>.
+        </p>
       </section>
 
       <section className="bp-panel">

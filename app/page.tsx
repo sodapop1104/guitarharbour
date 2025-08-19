@@ -4,7 +4,6 @@ import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import Repairs from "@/components/Repairs";
 import Shop from "@/components/Shop";
-import History from "@/components/History";
 import Reviews from "@/components/Reviews";
 import About from "@/components/About";
 import Contact from "@/components/Contact";
@@ -19,7 +18,6 @@ export default function Page() {
         <Services />
         <Repairs />
         <Shop />
-        <History />
         <section id="about"><div className="container"><About /></div></section>
         <Contact />
       </main>

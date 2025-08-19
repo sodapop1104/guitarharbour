@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import ThemeProvider from "@/components/ThemeProvider";
 import RevealManager from "@/components/RevealManager";
+import ConsentBanner from "@/components/ConsentBanner"; // ← added
 
 export const metadata: Metadata = {
   title: "Guitar Harbour",
@@ -35,6 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <RevealManager />
           {children}
+          {/* Non-essential cookies consent (no analytics loader used) */}
+          <ConsentBanner />
         </ThemeProvider>
       </body>
     </html>
