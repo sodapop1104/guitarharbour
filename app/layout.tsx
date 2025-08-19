@@ -12,9 +12,14 @@ export const metadata: Metadata = {
   title: "Guitar Harbour",
   description: "Black & white guitar workshop — repairs, setups, and clean builds.",
   icons: { icon: "/assets/favicon.svg" },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" }
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };
 

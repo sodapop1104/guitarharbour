@@ -34,7 +34,6 @@ export default function Header() {
             <li><a href="#services">Services</a></li>
             <li><a href="#repairs">Repairs</a></li>
             <li><a href="#shop">Shop</a></li>
-            <li><a href="#history">History</a></li>
             <li><a href="#about">About</a></li>
           </ul>
         </nav>

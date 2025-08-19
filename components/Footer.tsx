@@ -1,5 +1,4 @@
 export default function Footer() {
-  // keep static to avoid edge-case hydration differences at midnight
   return (
     <footer>
       <div className="container">
@@ -11,30 +10,20 @@ export default function Footer() {
             gap: 16,
             flexWrap: "wrap",
             alignItems: "center",
+            fontSize: "0.9rem",
           }}
         >
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <span>© 2025 Guitar Harbour</span>
-            <span className="muted">guitarharbour.com</span>
+            <span className="muted">Temple City, CA</span>
           </div>
 
-          <ul
-            style={{
-              display: "flex",
-              gap: 12,
-              listStyle: "none",
-              padding: 0,
-              margin: 0,
-              flexWrap: "wrap",
-            }}
-          >
-            <li>
-              <a href="/privacy">Privacy Policy</a>
-            </li>
-            <li>
-              <a href="/do-not-sell">Do Not Sell or Share My Personal Information</a>
-            </li>
-          </ul>
+          <div className="footer-links" style={{ display: "flex", gap: 8 }}>
+            <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> | 
+            <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> | 
+            <a href="/do-not-sell" target="_blank" rel="noopener noreferrer">Do Not Sell</a> | 
+            <a href="/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>
+          </div>
         </div>
       </div>
     </footer>

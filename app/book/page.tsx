@@ -22,11 +22,13 @@ function formatRangeISO(startISO: string, minutes: number, tz: string) {
   const endNoMeridiem = endStr.replace(/\s?[AP]M$/i, '');
   return `${startNoMeridiem}–${endNoMeridiem} ${ampm}`.trim();
 }
+
 function getTzShort(tz: string) {
   const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'short' })
     .formatToParts(new Date());
   return parts.find(p => p.type === 'timeZoneName')?.value || tz;
 }
+
 function validateEmail(val: string): string | null {
   const v = val.trim();
   if (!v) return 'Email is required.';
@@ -177,10 +179,10 @@ export default function Page() {
         </div>
 
         {/* Notice at collection (CPRA) */}
-        <p style={{ fontSize: 12, color: '#7a7a7a', marginTop: 6, lineHeight: 1.4 }}>
+        <p className="bp-notice" style={{ fontSize: 12, marginTop: 6, lineHeight: 1.4 }}>
           We collect your name, email, and booking notes to schedule your consultation and communicate about your request.
-          We retain this information only as long as needed to provide the service. See our{" "}
-          <a href="/privacy">Privacy Policy</a>. To opt out of sale/sharing, visit{" "}
+          We retain this information only as long as needed to provide the service. See our{' '}
+          <a href="/privacy">Privacy Policy</a>. To opt out of sale/sharing, visit{' '}
           <a href="/do-not-sell">Do Not Sell or Share My Personal Information</a>.
         </p>
       </section>
