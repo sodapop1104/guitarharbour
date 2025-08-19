@@ -1,59 +1,72 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-const KEY = "gh_consent_v1";
-type Consent = { analytics: boolean; marketing: boolean; ts: number };
+function hasCookie(name: string): boolean {
+  return document.cookie.split('; ').some(c => c.startsWith(`${name}=`));
+}
+
+function setCookie(name: string, value: string, maxAgeSeconds: number): void {
+  const secure = location.protocol === 'https:' ? 'Secure; ' : '';
+  document.cookie = `${name}=${encodeURIComponent(value)}; ${secure}SameSite=Lax; Path=/; Max-Age=${maxAgeSeconds}`;
+}
 
 export default function ConsentBanner() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const gpc = (typeof navigator !== "undefined" && (navigator as any).globalPrivacyControl) || false;
-    const saved = typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
-    if (!saved) {
-      setOpen(true);
-      if (gpc) {
-        const c: Consent = { analytics: false, marketing: false, ts: Date.now() };
-        localStorage.setItem(KEY, JSON.stringify(c));
-        setOpen(false);
-      }
+    // Show banner if neither consent nor opt-out cookie exists
+    if (typeof document !== 'undefined') {
+      const seen = hasCookie('gh_consent') || hasCookie('gh_optout');
+      setOpen(!seen);
     }
   }, []);
 
-  function save(consent: Consent) {
-    localStorage.setItem(KEY, JSON.stringify(consent));
+  async function acceptAll() {
+    // Store consent for a year
+    setCookie('gh_consent', 'accepted', 60 * 60 * 24 * 365);
+    setOpen(false);
+  }
+
+  async function declineSharing() {
+    // Hit server route to persist opt-out + cookie (and set a local cookie as a fallback)
+    try {
+      await fetch('/api/ccpa/optout', { method: 'POST' });
+    } catch {
+      // fallback local cookie for a year
+      setCookie('gh_optout', '1', 60 * 60 * 24 * 365);
+    }
     setOpen(false);
   }
 
   if (!open) return null;
 
   return (
-    <div style={{
-      position: "fixed", inset: "auto 12px 12px 12px", zIndex: 1000,
-      background: "var(--bp-panel, #11131a)", color: "var(--bp-text, #e8eaf4)",
-      border: "1px solid var(--bp-border, #232637)", borderRadius: 14, padding: 14,
-      boxShadow: "0 8px 24px rgba(0,0,0,.35)"
-    }}>
-      <div style={{ fontWeight: 600, marginBottom: 6 }}>Cookies & Privacy</div>
-      <div style={{ opacity: .8, fontSize: 13, marginBottom: 10 }}>
-        We use necessary cookies to run the site. We’d also like to use analytics to improve Guitar Harbour.
-      </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button className="bp-slot" style={{ padding: "8px 12px" }}
-          onClick={() => save({ analytics: true, marketing: false, ts: Date.now() })}>
-          Accept analytics
-        </button>
-        <button className="bp-slot" style={{ padding: "8px 12px" }}
-          onClick={() => save({ analytics: false, marketing: false, ts: Date.now() })}>
-          Reject non-essential
-        </button>
-        <a className="bp-badge" href="/privacy" style={{ textDecoration: "none", alignSelf: "center" }}>
-          Privacy Policy
-        </a>
-        <a className="bp-badge" href="/do-not-sell" style={{ textDecoration: "none", alignSelf: "center" }}>
+    <div
+      role="dialog"
+      aria-label="Privacy options"
+      style={{
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 10000,
+        background: 'var(--bg)',
+        borderTop: '1px solid var(--line)',
+        padding: '12px 16px'
+      }}
+    >
+      <div className="container" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span className="muted" style={{ flex: 1, minWidth: 240 }}>
+          We use only essential cookies by default. You can accept additional cookies or opt out of sale/sharing.
+          See our <a href="/privacy">Privacy Policy</a>.
+        </span>
+        <button className="btn" onClick={declineSharing} aria-label="Do Not Sell or Share">
           Do Not Sell/Share
-        </a>
+        </button>
+        <button className="btn" onClick={acceptAll} aria-label="Accept">
+          Accept
+        </button>
       </div>
     </div>
   );
