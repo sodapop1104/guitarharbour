@@ -97,7 +97,7 @@ export default function Contact() {
 
           {/* Shop Details */}
           <div className="reveal" data-anim="right" aria-label="Shop details">
-            <p><strong>Location</strong><br />123 Street Blvd<br />Temple City, CA 91007</p>
+            <p><strong>Location</strong><br />Based in Temple City, California, we serve musicians across the San Gabriel Valley and nearby areas. Our pickup-and-delivery service handles expert guitar repairs, setups, and modifications — we collect your instrument, care for it, and return it ready to play.</p>
             <p><strong>Hours</strong><br />Mon–Fri 9AM–6PM • Sat by appt. only</p>
             <p><strong>Email</strong><br /><a href="mailto:contact@guitarharbour.com">contact@guitarharbour.com</a></p>
 
