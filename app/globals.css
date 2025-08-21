@@ -603,3 +603,57 @@ body.anim .reveal.strum.in { transform: none; }
   opacity: 0;
   pointer-events: none;
 }
+
+/* ==== Booking: responsive date field (mobile-friendly) ==== */
+.bp-dateField {
+  position: relative;
+  display: block;       /* ensure it spans the full row */
+  width: 100%;
+}
+
+.bp-date {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;         /* consistent tap target */
+  font-size: 16px;      /* prevent iOS zoom */
+  -webkit-appearance: none;
+  appearance: none;
+  padding-left: 44px;   /* room for left icon */
+  background-image: none;
+}
+
+/* Left calendar icon (kept clickable from earlier) */
+.bp-dateField::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%);
+  background-color: var(--bp-muted);
+  cursor: pointer;
+  transition: background-color .2s ease, transform .12s ease;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/></svg>") center/contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/></svg>") center/contain no-repeat;
+}
+.bp-dateField:hover::before { background-color: var(--bp-brand); transform: translateY(-50%) scale(1.05); }
+.bp-dateField:active::before { transform: translateY(-50%) scale(0.98); }
+.bp-dateField:focus-within::before { background-color: var(--bp-brand); }
+
+/* Hide the native right-side picker so our left icon is primary */
+.bp-date::-webkit-calendar-picker-indicator { opacity: 0; pointer-events: none; }
+
+/* --- Small screens: tighten spacing & icon size --- */
+@media (max-width: 480px) {
+  .bp-date {
+    height: 44px;
+    padding-left: 40px; /* match smaller icon */
+  }
+  .bp-dateField::before {
+    left: 10px;
+    width: 18px;
+    height: 18px;
+  }
+}
