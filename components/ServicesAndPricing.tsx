@@ -2,6 +2,16 @@ export default function ServicesAndPricing() {
   return (
     <section id="services">
       <div className="container">
+        {/* Preface / value statement */}
+        <div className="reveal" data-anim="up" style={{ marginBottom: 18 }}>
+          <h3 className="gradient-text" style={{ margin: 0 }}>The Difference Is in the Details</h3>
+          <div className="fret-divider" />
+          <p className="muted" style={{ margin: 0 }}>
+            Your guitar deserves more than a quick fix. With premium tools and years of experience,
+            every adjustment is measured, tested, and refined—so it plays and sounds at its peak.
+          </p>
+        </div>
+
         <h2 className="reveal" data-anim="up">Services &amp; Pricing</h2>
 
         <div className="grid stagger reveal" data-anim="up">
@@ -63,7 +73,7 @@ export default function ServicesAndPricing() {
 
           {/* Custom Nut Fabrication */}
           <article className="card service-card">
-            <h3>Custom Nut Fabrication – $60–100</h3>
+            <h3>Custom Nut Fabrication – $60–$100</h3>
             <ul className="pick-list">
               <li>Crafted with precise spacing ruler tools</li>
               <li>Material options: GraphTech, bone, slotted or blank</li>
