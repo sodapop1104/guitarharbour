@@ -327,16 +327,21 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
    BOOKING PAGE (SCOPED VARS)
 ========================= */
 .bp-wrap {
+  /* Dark-first palette */
   --bp-bg: #0b0c0f;
   --bp-panel: #11131a;
   --bp-card: #151824;
   --bp-border: #232637;
-  --bp-text: #e8eaf4;
+  --bp-text: #f1f3ff;      /* brighter for contrast */
+  --bp-heading: #ffffff;   /* headings max contrast */
+  --bp-link: #aeb8ff;      /* readable links on dark */
+  --bp-link-hover: #c7d0ff;
   --bp-muted: #a2a8c1;
   --bp-brand: #7c5cff;
   --bp-brand-600: #6a4cf0;
   --bp-error: #ff4d4f;
   --bp-shadow: 0 10px 30px rgba(2, 8, 23, 0.5);
+
   color: var(--bp-text);
   background: var(--bg); /* respect site bg behind panels */
 }
@@ -349,6 +354,9 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
     --bp-card: #ffffff;
     --bp-border: #e6e8f0;
     --bp-text: #0b0c0f;
+    --bp-heading: #0a0b0e;
+    --bp-link: #2b59ff;
+    --bp-link-hover: #1d46d8;
     --bp-muted: #4e556b;
     --bp-brand: #5b7cff;
     --bp-brand-600: #4b69f0;
@@ -363,6 +371,9 @@ html[data-theme="light"] .bp-wrap{
   --bp-card: #ffffff;
   --bp-border: #e6e8f0;
   --bp-text: #0b0c0f;
+  --bp-heading: #0a0b0e;
+  --bp-link: #2b59ff;
+  --bp-link-hover: #1d46d8;
   --bp-muted: #4e556b;
   --bp-brand: #5b7cff;
   --bp-brand-600: #4b69f0;
@@ -389,7 +400,12 @@ html[data-theme="light"] .bp-wrap{
   justify-items: center;
   text-align: center;
 }
-.bp-title { font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px; color: var(--bp-text); }
+.bp-title {
+  font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px;
+  color: var(--bp-heading);
+  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+}
+html[data-theme="light"] .bp-title { text-shadow: none; }
 .bp-subtitle { margin: 0; color: var(--bp-muted); font-size: 14px; }
 
 .bp-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
@@ -399,6 +415,11 @@ html[data-theme="light"] .bp-wrap{
   border: 1px solid color-mix(in oklab, var(--bp-brand) 26%, transparent);
   padding: 6px 10px; border-radius: 999px;
 }
+
+/* Contrast-safe links within booking */
+.bp-wrap a.bp-link,
+.bp-wrap a { color: var(--bp-link); text-decoration: underline; text-underline-offset: 2px; }
+.bp-wrap a:hover { color: var(--bp-link-hover); }
 
 .bp-panel {
   background: var(--bp-panel);
@@ -420,7 +441,7 @@ html[data-theme="light"] .bp-wrap{
 .bp-inputError { border-color: color-mix(in oklab, var(--bp-error) 60%, var(--bp-border)); box-shadow: 0 0 0 6px color-mix(in oklab, var(--bp-error) 22%, transparent); }
 .bp-error { color: var(--bp-error); font-size: 12px; margin-top: 6px; }
 
-.bp-sectionTitle { margin: 0 0 12px; font-size: 16px; }
+.bp-sectionTitle { margin: 0 0 12px; font-size: 16px; color: var(--bp-heading); }
 .bp-help { color: var(--bp-muted); font-size: 13px; margin: 6px 0 12px; }
 
 .bp-grid,
@@ -440,7 +461,7 @@ html[data-theme="light"] .bp-wrap{
 .bp-slot:active:not(:disabled) { transform: translateY(0); }
 .bp-slot:disabled { opacity: .6; cursor: not-allowed; }
 
-.bp-slotPrimary { font-weight: 700; }
+.bp-slotPrimary { font-weight: 700; color: var(--bp-heading); }
 .bp-slotSecondary { margin-top: 4px; font-size: 12px; color: var(--bp-muted); }
 .bp-muted { opacity: .7; }
 
@@ -454,6 +475,8 @@ html[data-theme="light"] .bp-wrap{
 }
 @keyframes bp-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+/* Booking form grid (base + mobile) */
+.bp-formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
 @media (max-width: 720px) { .bp-formGrid { grid-template-columns: 1fr; } }
 
 /* =========================
@@ -553,26 +576,16 @@ body.anim .reveal.strum.in { transform: none; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
 /* =========================================================
-   BOOKING: Date field with LEFT calendar icon (clickable)
-   - Bigger icon on the left
-   - Theme-aware (uses --bp-muted / --bp-brand)
-   - Opens native picker via onClick handler on wrapper
-   - Hides the native right-side indicator
+   BOOKING: Date field with LEFT calendar icon (single, deduped)
 ========================================================= */
-.bp-dateField {
-  position: relative;
-}
+.bp-dateField { position: relative; display: block; width: 100%; }
 
-/* Left icon */
 .bp-dateField::before {
   content: "";
   position: absolute;
-  left: 12px;
-  top: 50%;
-  width: 20px;               /* icon size */
-  height: 20px;
-  transform: translateY(-50%);
-  background-color: var(--bp-muted);  /* follows booking theme */
+  left: 12px; top: 50%;
+  width: 20px; height: 20px; transform: translateY(-50%);
+  background-color: var(--bp-muted);
   transition: background-color .2s ease, transform .12s ease;
   cursor: pointer;
 
@@ -586,74 +599,55 @@ body.anim .reveal.strum.in { transform: none; }
     <path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/>\
   </svg>") center / contain no-repeat;
 }
-
-/* Tiny polish: hover/active feedback + focus color */
 .bp-dateField:hover::before { background-color: var(--bp-brand); transform: translateY(-50%) scale(1.05); }
 .bp-dateField:active::before { transform: translateY(-50%) scale(0.98); }
 .bp-dateField:focus-within::before { background-color: var(--bp-brand); }
-
-/* Make room for the icon inside the input */
-.bp-date {
-  padding-left: 44px;         /* icon(20) + left(12) + gap */
-  background-image: none;     /* normalize */
-}
-
-/* Hide native right-side picker icon so left icon is primary */
-.bp-date::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* ==== Booking: responsive date field (mobile-friendly) ==== */
-.bp-dateField {
-  position: relative;
-  display: block;       /* ensure it spans the full row */
-  width: 100%;
-}
 
 .bp-date {
   display: block;
   width: 100%;
-  box-sizing: border-box;
-  height: 48px;         /* consistent tap target */
-  font-size: 16px;      /* prevent iOS zoom */
-  -webkit-appearance: none;
-  appearance: none;
-  padding-left: 44px;   /* room for left icon */
-  background-image: none;
+  height: 48px;               /* consistent tap target */
+  font-size: 16px;            /* prevent iOS zoom */
+  -webkit-appearance: none; appearance: none;
+  padding-left: 44px;         /* room for left icon */
+  background-image: none;     /* normalize */
 }
-
-/* Left calendar icon (kept clickable from earlier) */
-.bp-dateField::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  width: 20px;
-  height: 20px;
-  transform: translateY(-50%);
-  background-color: var(--bp-muted);
-  cursor: pointer;
-  transition: background-color .2s ease, transform .12s ease;
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/></svg>") center/contain no-repeat;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/></svg>") center/contain no-repeat;
-}
-.bp-dateField:hover::before { background-color: var(--bp-brand); transform: translateY(-50%) scale(1.05); }
-.bp-dateField:active::before { transform: translateY(-50%) scale(0.98); }
-.bp-dateField:focus-within::before { background-color: var(--bp-brand); }
-
-/* Hide the native right-side picker so our left icon is primary */
 .bp-date::-webkit-calendar-picker-indicator { opacity: 0; pointer-events: none; }
 
-/* --- Small screens: tighten spacing & icon size --- */
 @media (max-width: 480px) {
-  .bp-date {
-    height: 44px;
-    padding-left: 40px; /* match smaller icon */
-  }
-  .bp-dateField::before {
-    left: 10px;
-    width: 18px;
-    height: 18px;
-  }
+  .bp-date { height: 44px; padding-left: 40px; }
+  .bp-dateField::before { left: 10px; width: 18px; height: 18px; }
+}
+
+/* ==== FINAL HARD FIX: booking title must be readable in dark ==== */
+
+/* If any ancestor applied opacity/filter/blend, neutralize it on the booking header */
+.bp-header {
+  position: relative;
+  z-index: 10;
+  isolation: isolate;
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Un-dim anything inside the header */
+.bp-header * {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+/* Force max-contrast title color */
+.bp-title {
+  position: relative;
+  color: #fff !important;                 /* hard white */
+  text-shadow: none !important;           /* remove darkening */
+  -webkit-text-fill-color: currentColor;  /* bypass text-fill quirks */
+}
+
+/* In light theme, return to dark heading */
+html[data-theme="light"] .bp-title {
+  color: #0a0b0e !important;
 }

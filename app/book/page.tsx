@@ -43,7 +43,7 @@ export default function Page() {
   const viewerTz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
   const dateInputRef = useRef<HTMLInputElement>(null);
 
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // may be corrected after first fetch
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [earliestAllowedDate, setEarliestAllowedDate] = useState<string | null>(null);
   const [slots, setSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,10 +65,9 @@ export default function Page() {
         const minFromApi: string | undefined = d.earliestAllowedDate;
         if (minFromApi) {
           setEarliestAllowedDate(minFromApi);
-          // If user landed on a blocked day (today/past), auto-bump to earliest allowed.
           if (date < minFromApi) {
             setDate(minFromApi);
-            return; // next effect run will fetch slots for the corrected date
+            return;
           }
         }
         setSlots(d.slots || []);
@@ -117,17 +116,11 @@ export default function Page() {
     alert('Request sent! You’ll get a confirmation once approved.');
   }
 
-  // Open native date picker when clicking the left icon/wrapper
   function openDatePicker() {
-    const el = dateInputRef.current;
+    const el = dateInputRef.current as (HTMLInputElement & { showPicker?: () => void }) | null;
     if (!el) return;
-    const withPicker = el as HTMLInputElement & { showPicker?: () => void };
-    if (typeof withPicker.showPicker === 'function') {
-      withPicker.showPicker();
-    } else {
-      el.focus();
-      el.click();
-    }
+    if (typeof el.showPicker === 'function') el.showPicker();
+    else { el.focus(); el.click(); }
   }
 
   function onDateKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
@@ -142,6 +135,8 @@ export default function Page() {
       <header className="bp-header">
         <div>
           <h1 className="bp-title">Request an online consultation</h1>
+          {/* optional supporting line; inherits readable tokens */}
+          {/* <p className="bp-subtitle">Pick a date and time that works for you.</p> */}
         </div>
         <div className="bp-badges">
           <span className="bp-badge">You: {viewerTz} ({tzShort})</span>
@@ -153,7 +148,6 @@ export default function Page() {
       <section className="bp-panel">
         <label className="bp-label">
           <span>Date</span>
-          {/* Clickable left-icon wrap */}
           <div
             className="bp-dateField"
             onClick={openDatePicker}
@@ -230,8 +224,8 @@ export default function Page() {
         <p className="bp-notice" style={{ fontSize: 12, marginTop: 6, lineHeight: 1.4 }}>
           We collect your name, email, and booking notes to schedule your consultation and communicate about your request.
           We retain this information only as long as needed to provide the service. See our{' '}
-          <a href="/privacy"><strong>Privacy Policy</strong></a>. To opt out of sale/sharing, visit{' '}
-          <a href="/do-not-sell"><strong>Do Not Sell or Share My Personal Information</strong></a>.
+          <a className="bp-link" href="/privacy"><strong>Privacy Policy</strong></a>. To opt out of sale/sharing, visit{' '}
+          <a className="bp-link" href="/do-not-sell"><strong>Do Not Sell or Share My Personal Information</strong></a>.
         </p>
       </section>
 
