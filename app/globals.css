@@ -105,7 +105,25 @@ header.site-header {
   position:absolute; left:50%; transform: translateX(-50%);
   display:flex; align-items:center; gap:12px; min-width:0;
 }
-.logo img { height:28px; width:auto; }
+.logo img { height:48px; width:auto; }
+
+/* Wordmark beside the icon */
+.logo-word {
+  font-family: "Poppins", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(24px, 2.4vw, 34px); /* bigger & responsive */
+  letter-spacing: -0.4px;
+  color: var(--fg);   /* auto dark/light */
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Slightly tighter spacing on small screens */
+@media (max-width: 520px){
+  .logo { gap: 8px; }
+  .logo-word { font-size: clamp(20px, 5vw, 28px); }
+}
+
 
 /* Logo theme switching */
 .logo-light { display: none; }
@@ -651,3 +669,4 @@ body.anim .reveal.strum.in { transform: none; }
 html[data-theme="light"] .bp-title {
   color: #0a0b0e !important;
 }
+

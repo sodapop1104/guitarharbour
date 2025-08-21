@@ -6,16 +6,17 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="site-header">{/* <-- add this class */}
+    <header className="site-header">
       <div className="nav container-fluid">
         <div className="nav-left">
           <ThemeToggle />
         </div>
 
+        {/* Center logo + wordmark */}
         <div className="logo" aria-label="Guitar Harbour">
           <img className="logo-dark" src="/assets/logo.svg" alt="" aria-hidden="true" />
           <img className="logo-light" src="/assets/logo1.svg" alt="" aria-hidden="true" />
-          <strong>Guitar Harbour</strong>
+          <span className="logo-word">Guitar Harbour</span>
         </div>
 
         <nav aria-label="Primary">

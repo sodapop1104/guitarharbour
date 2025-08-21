@@ -22,7 +22,8 @@ export default function Footer() {
             <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> | 
             <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> | 
             <a href="/do-not-sell" target="_blank" rel="noopener noreferrer">Do Not Sell</a> | 
-            <a href="/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>
+            <a href="/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a> |
+            <a href="/cookies" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
           </div>
         </div>
       </div>
