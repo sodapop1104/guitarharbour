@@ -44,6 +44,7 @@ body {
 }
 a { color: var(--fg); text-decoration: none; }
 img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
+p { margin: 0 0 12px; } /* consistent paragraph rhythm */
 
 /* Prevent #anchor jumps from hiding under fixed header */
 [id] { scroll-margin-top: calc(var(--header-h) + 12px); }
@@ -72,8 +73,11 @@ img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
   letter-spacing: .06em;
   font-weight: 600;
   transition: transform .08s ease, background .2s ease, color .2s ease;
+  border-radius: 12px;
+  will-change: transform;
 }
 .btn:hover { background:var(--fg); color:var(--bg); transform: translateY(-1px); }
+.btn:active{ transform: translateY(0); }
 .btn.block { display:block; width:100%; text-align:center; }
 
 /* Small light/dark toggle */
@@ -86,9 +90,9 @@ img, picture, video { max-width: 100%; height: auto; filter: grayscale(100%); }
 .divider { height:1px; background: var(--line); }
 
 /* =========================
-   HEADER / NAV
+   HEADER / NAV (scoped to site nav only)
 ========================= */
-header {
+header.site-header {
   position: fixed; inset: 0 0 auto 0;
   height: var(--header-h);
   backdrop-filter: blur(6px);
@@ -96,9 +100,7 @@ header {
   border-bottom: 1px solid var(--line);
   z-index: 1000;
 }
-.nav {
-  position: relative; display:flex; align-items:center; height: var(--header-h);
-}
+.nav { position: relative; display:flex; align-items:center; height: var(--header-h); }
 .logo {
   position:absolute; left:50%; transform: translateX(-50%);
   display:flex; align-items:center; gap:12px; min-width:0;
@@ -143,7 +145,7 @@ nav a:hover { opacity:1; }
   overflow: clip;
 }
 .hero h1 { font-size: clamp(34px, 6vw, 72px); line-height: 1.04; margin: 0 0 14px; letter-spacing: -.02em; }
-.hero p { max-width: 680px; font-size: clamp(16px, 2.6vw, 20px); color:var(--muted); margin: 0 0 28px; }
+.hero p  { max-width: 680px; font-size: clamp(16px, 2.6vw, 20px); color:var(--muted); margin: 0 0 28px; }
 .hero-cta { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; max-width: 520px; }
 @media (min-width: 640px){ .hero-cta { display:flex; max-width:none; } }
 
@@ -151,7 +153,12 @@ nav a:hover { opacity:1; }
    SECTIONS & TYPO
 ========================= */
 section { padding: clamp(56px, 8vw, 80px) 0; }
-h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em; text-transform: uppercase; }
+h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 20px; letter-spacing:.02em; text-transform: uppercase; }
+
+/* content lists — consistent bullets/colors/spacing */
+section ul { padding-left: 20px; margin: 8px 0 0; }
+section li { line-height: 1.55; margin: 6px 0; }
+section li::marker { color: color-mix(in oklab, var(--fg) 72%, var(--muted)); }
 
 /* Align about with history rhythm */
 #about.align-with-above { padding-top: clamp(48px, 7vw, 72px); }
@@ -166,11 +173,21 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
   background: var(--surface);
   padding: clamp(14px, 2.4vw, 18px);
   border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  border-color: color-mix(in oklab, var(--fg) 22%, var(--line));
 }
 @media (min-width: 620px){ .card { grid-column: span 6; } }
 @media (min-width: 980px){ .card { grid-column: span 4; } }
-.card h3 { margin:0 0 8px; font-size: clamp(16px, 2.8vw, 18px); text-transform: uppercase; letter-spacing:.06em; }
-.card p { color:var(--muted); margin:0; }
+.card h3 { margin:0 0 10px; font-size: clamp(16px, 2.8vw, 18px); text-transform: uppercase; letter-spacing:.06em; }
+.card p  { color:var(--muted); margin:0; }
+.card ul { margin-top: 8px; } /* consistent list spacing inside cards */
+.service-card { cursor: default; }
+.service-card ul { color: var(--fg); } /* readable in both themes */
 
 /* =========================
    SLIDER (SHOP)
@@ -184,6 +201,13 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
   min-width: 80%; scroll-snap-align: start;
   border:1px solid var(--line); background: var(--surface);
   border-radius:16px; padding:18px;
+  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.slide:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  border-color: color-mix(in oklab, var(--fg) 22%, var(--line));
 }
 @media (min-width: 900px){ .slide { min-width: 33.33%; } }
 
@@ -196,7 +220,7 @@ h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 24px; letter-spacing:.02em;
 .slider .prev { left: 6px; }
 .slider .next { right: 6px; }
 
-/* Hide arrows when at ends (section#shop adds data-at-start / data-at-end) */
+/* Hide arrows when at ends (section#shop sets data-at-start / data-at-end) */
 section#shop[data-at-start="true"] .slider .prev,
 section#shop[data-at-end="true"]   .slider .next { opacity:0; pointer-events:none; }
 
@@ -313,7 +337,11 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
   --bp-brand-600: #6a4cf0;
   --bp-error: #ff4d4f;
   --bp-shadow: 0 10px 30px rgba(2, 8, 23, 0.5);
+  color: var(--bp-text);
+  background: var(--bg); /* respect site bg behind panels */
 }
+
+/* If the OS prefers light (fallback for first paint) */
 @media (prefers-color-scheme: light) {
   .bp-wrap {
     --bp-bg: #f7f8fc;
@@ -328,16 +356,43 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
   }
 }
 
-/* Booking layout/components (consume the scoped vars) */
+/* Sync booking theme with site theme toggle */
+html[data-theme="light"] .bp-wrap{
+  --bp-bg: #f7f8fc;
+  --bp-panel: #ffffff;
+  --bp-card: #ffffff;
+  --bp-border: #e6e8f0;
+  --bp-text: #0b0c0f;
+  --bp-muted: #4e556b;
+  --bp-brand: #5b7cff;
+  --bp-brand-600: #4b69f0;
+  --bp-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+}
+
+/* Booking layout/components */
 .bp-wrap {
   max-width: 980px; margin: 40px auto 80px; padding: 0 20px;
   color: var(--bp-text);
 }
-.bp-header { display: grid; gap: 14px; margin-bottom: 18px; }
-.bp-title { font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px; }
+.bp-header {
+  position: static;
+  inset: auto;
+  height: auto;
+  background: transparent;
+  border: 0;
+
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto 18px;  /* center the block */
+  padding: 0 18px;
+  justify-items: center;
+  text-align: center;
+}
+.bp-title { font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px; color: var(--bp-text); }
 .bp-subtitle { margin: 0; color: var(--bp-muted); font-size: 14px; }
 
-.bp-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.bp-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .bp-badge {
   font-size: 12px; color: var(--bp-brand);
   background: color-mix(in oklab, var(--bp-brand) 12%, transparent);
@@ -389,6 +444,7 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
 .bp-slotSecondary { margin-top: 4px; font-size: 12px; color: var(--bp-muted); }
 .bp-muted { opacity: .7; }
 
+/* Skeleton shimmer */
 .bp-skeleton {
   background: linear-gradient(90deg,
     color-mix(in oklab, var(--bp-card) 96%, #fff),
@@ -421,297 +477,129 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
 .error { color: #e74c3c; font-size: .85rem; margin-top: 4px; }
 
 /* =========================
-   MODERN SLICK POLISH PACK
-   (drop-in enhancements)
+   GUITAR-THEMED POLISH
 ========================= */
 
-/* --- Tokens --- */
-:root{
-  --accent: #7c5cff;           /* brand accent */
-  --accent-600: #6a4cf0;
-  --radius: 16px;               /* global radius */
-  --r-sm: 12px; --r-lg: 24px;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,.15);
-  --shadow-sm: 0 8px 24px rgba(0,0,0,.18);
-  --shadow-md: 0 14px 40px rgba(0,0,0,.28);
-  --ring: 0 0 0 6px color-mix(in oklab, var(--accent) 22%, transparent);
-  --grad-soft: linear-gradient(180deg, color-mix(in oklab, var(--bg) 90%, #fff) 0%, var(--bg) 100%);
+/* 1) Strings background (for hero or section headers) */
+.strings { position: relative; isolation: isolate; }
+.strings::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom,
+      transparent 0%,
+      color-mix(in oklab, var(--fg) 16%, transparent) 0.5%,
+      transparent 1.2%) repeat-y;
+  /* ~6 strings */
+  background-size: 100% 16.66%;
+  opacity: .28;
+  pointer-events: none;
+  z-index: -1;
 }
 
-html[data-theme="light"]{
-  --accent: #5b7cff;
-  --accent-600: #4b69f0;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,.08);
-  --shadow-sm: 0 8px 24px rgba(0,0,0,.10);
-  --shadow-md: 0 14px 40px rgba(0,0,0,.14);
-}
-
-/* --- Better focus states (keyboard love) --- */
-:where(a, button, input, textarea, select, .btn, .bp-input, .bp-date):focus-visible{
-  outline: none;
-  box-shadow: var(--ring);
-  border-color: var(--accent) !important;
-}
-
-/* --- Links: subtle underline & hover lift --- */
-a{
-  text-underline-offset: 3px;
-  text-decoration-thickness: .08em;
-  text-decoration-color: color-mix(in oklab, var(--fg) 24%, transparent);
-}
-a:hover{ text-decoration: underline; }
-
-/* --- Header: glassy + hairline accent --- */
-header{
-  background: color-mix(in oklab, var(--header-bg) 86%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--line) 84%, var(--accent) 16%);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
-/* --- Hero: gradient title option --- */
-.hero h1.gradient{
-  background: linear-gradient(92deg, var(--accent), color-mix(in oklab, var(--accent) 60%, var(--fg)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* --- Buttons: variants --- */
-.btn{
-  border-radius: var(--r-sm);
-  will-change: transform;
-  box-shadow: var(--shadow-xs);
-}
-.btn:active{ transform: translateY(0); }
-
-.btn.primary{
-  background: var(--accent);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 10px 30px color-mix(in oklab, var(--accent) 30%, transparent);
-}
-.btn.primary:hover{ background: var(--accent-600); color:#fff; transform: translateY(-1px); }
-
-.btn.soft{
-  background: color-mix(in oklab, var(--accent) 12%, var(--bg));
-  border-color: color-mix(in oklab, var(--accent) 26%, var(--bg));
-  color: color-mix(in oklab, var(--accent) 82%, var(--fg));
-}
-.btn.ghost{
-  border-color: color-mix(in oklab, var(--fg) 40%, var(--line));
-  color: var(--fg);
-  background: transparent;
-}
-.btn.ghost:hover{
-  background: color-mix(in oklab, var(--fg) 8%, transparent);
-}
-
-/* --- Cards: gradient border + lift on hover --- */
-.card{
+/* 2) Fretboard divider with dots (use under titles) */
+.fret-divider {
   position: relative;
-  border-radius: var(--radius);
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(180deg,
-      color-mix(in oklab, var(--accent) 28%, var(--line)),
-      color-mix(in oklab, var(--accent) 8%, var(--line))) border-box;
-  border: 1px solid transparent; /* shows gradient */
-  box-shadow: var(--shadow-xs);
-  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+  height: 18px;
+  margin: 10px 0 16px;
+  border-top: 1px solid var(--line);
 }
-.card:hover{
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-sm);
-  border-color: color-mix(in oklab, var(--accent) 34%, var(--line));
-}
-
-/* --- Slider buttons: floating pills --- */
-.slider button{
-  border-radius: 999px;
-  box-shadow: var(--shadow-xs);
-  background: color-mix(in oklab, var(--bg) 88%, transparent);
+.fret-divider::before,
+.fret-divider::after {
+  content: "•  •";
+  letter-spacing: 10px;
+  position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  color: color-mix(in oklab, var(--fg) 50%, var(--muted));
+  font-size: 12px;
 }
 
-/* --- Section dividers: subtle gradient background option --- */
-.section-soft{
-  background: var(--grad-soft);
-  border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+/* 3) Pick bullets (smaller) */
+.pick-list { list-style: none; padding-left: 0; }
+.pick-list > li { position: relative; padding-left: 18px; }
+.pick-list > li::before {
+  content: "";
+  position: absolute; left: 0; top: .48em;
+  width: 9px; height: 9px; /* smaller pick */
+  border-radius: 40% 60% 70% 30% / 40% 40% 60% 60%;
+  background: color-mix(in oklab, var(--fg) 70%, var(--bg));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--fg) 26%, var(--bg));
+  transform: rotate(10deg);
+}
+.pick-list .pick-list { margin-top: 6px; } /* nested pick lists */
+
+/* 4) Pick button variant (compact) */
+.btn.pick {
+  border-radius: 999px 999px 700px 999px / 900px 900px 600px 900px;
+  padding: 10px 14px;
 }
 
-/* --- Inputs: sleek + filled states --- */
-input, textarea{
-  border-radius: 12px;
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(180deg, color-mix(in oklab, var(--line) 92%, var(--accent)), var(--line)) border-box;
-  border: 1px solid transparent;
-  transition: border-color .2s, background .2s, box-shadow .2s;
+/* 5) Service cards: subtle “strum” hover */
+.card.service-card {
+  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .25s ease;
 }
-input:hover, textarea:hover{
-  border-color: color-mix(in oklab, var(--accent) 26%, var(--line));
-}
-input:focus, textarea:focus{
-  border-color: var(--accent);
+.card.service-card:hover{
+  transform: translateY(-3px) rotate(-.15deg);
+  border-color: color-mix(in oklab, var(--fg) 22%, var(--line));
+  background: linear-gradient(var(--surface), var(--surface));
 }
 
-/* --- Footer: muted top fade --- */
-footer{
-  background:
-    linear-gradient(180deg, color-mix(in oklab, var(--bg) 96%, #000) 0%, var(--bg) 60%);
+/* 6) Strum-in reveal (uses your RevealManager) */
+body.anim .reveal.strum { transform: translateY(18px) rotate(-.2deg); }
+body.anim .reveal.strum.in { transform: none; }
+
+/* 7) Mono tab-style for prices/specs */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+/* =========================================================
+   BOOKING: Date field with LEFT calendar icon (clickable)
+   - Bigger icon on the left
+   - Theme-aware (uses --bp-muted / --bp-brand)
+   - Opens native picker via onClick handler on wrapper
+   - Hides the native right-side indicator
+========================================================= */
+.bp-dateField {
+  position: relative;
 }
 
-/* --- Utilities --- */
-.glass{
-  background: color-mix(in oklab, var(--bg) 68%, transparent);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in oklab, var(--line) 70%, var(--accent) 8%);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius);
-}
-.gradient-text{
-  background: linear-gradient(90deg, var(--accent), color-mix(in oklab, var(--accent) 50%, var(--fg)));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.shadow-md{ box-shadow: var(--shadow-md) !important; }
-.round-lg{ border-radius: var(--r-lg) !important; }
+/* Left icon */
+.bp-dateField::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 20px;               /* icon size */
+  height: 20px;
+  transform: translateY(-50%);
+  background-color: var(--bp-muted);  /* follows booking theme */
+  transition: background-color .2s ease, transform .12s ease;
+  cursor: pointer;
 
-/* --- Shop slides: smooth elevation --- */
-.slide{
-  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
-  box-shadow: var(--shadow-xs);
-}
-.slide:hover{
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-sm);
-  border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+  /* Vector calendar glyph (mask so we can recolor) */
+  -webkit-mask: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+    <path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/>\
+  </svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+    <path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/>\
+  </svg>") center / contain no-repeat;
 }
 
-/* ==== Booking header: mobile-left, desktop-centered ==== */
-.bp-header{
-  /* mobile defaults = left-aligned, same rhythm as panels */
-  padding: 0 18px;
-  justify-items: start;   /* grid children left on small screens */
-  text-align: left;
-  margin: 0 auto 18px;
-  row-gap: 10px;          /* a hair tighter on mobile */
+/* Tiny polish: hover/active feedback + focus color */
+.bp-dateField:hover::before { background-color: var(--bp-brand); transform: translateY(-50%) scale(1.05); }
+.bp-dateField:active::before { transform: translateY(-50%) scale(0.98); }
+.bp-dateField:focus-within::before { background-color: var(--bp-brand); }
+
+/* Make room for the icon inside the input */
+.bp-date {
+  padding-left: 44px;         /* icon(20) + left(12) + gap */
+  background-image: none;     /* normalize */
 }
 
-.bp-badges{
-  justify-content: flex-start; /* badges align left on mobile */
+/* Hide native right-side picker icon so left icon is primary */
+.bp-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  pointer-events: none;
 }
-
-/* Desktop+ polish: center and cap line length */
-@media (min-width: 900px){
-  .bp-header{
-    max-width: 760px;     /* keeps text measure comfy */
-    justify-items: center;/* centers grid children */
-    text-align: center;   /* centers title + subtitle */
-    row-gap: 14px;
-  }
-  .bp-badges{
-    justify-content: center; /* center the pill row */
-  }
-}
-
-/* Optional: make the title pop slightly across sizes */
-.bp-title{ letter-spacing: -0.02em; }
-
-/* =========================================
-   1) Scope the sticky site header to main
-   - Add class="site-header" to your global nav header in layout.
-   - Prevent generic <header> styles from hitting .bp-header.
-========================================= */
-
-/* Old rule was `header { position: fixed; ... }` — replace with: */
-header.site-header{
-  position: fixed; top:0; left:0; right:0;
-  height: var(--header-h);
-  backdrop-filter: blur(6px);
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--line);
-  z-index: 1000;
-}
-
-/* Booking page header must be normal flow */
-.bp-header{
-  position: static;
-  inset: auto;
-  height: auto;
-  background: transparent;
-  border: 0;
-}
-
-/* Keep our earlier centering behavior: mobile-left, desktop-centered */
-.bp-header{
-  padding: 0 18px;
-  justify-items: start;
-  text-align: left;
-  margin: 0 auto 18px;
-  row-gap: 10px;
-}
-.bp-badges{ justify-content: flex-start; }
-@media (min-width: 900px){
-  .bp-header{
-    max-width: 760px;
-    justify-items: center;
-    text-align: center;
-    row-gap: 14px;
-  }
-  .bp-badges{ justify-content: center; }
-}
-
-/* =========================================
-   2) Booking theme: honor html[data-theme]
-   (Dark as default, switch vars when light)
-========================================= */
-.bp-wrap{
-  --bp-bg: #0b0c0f;
-  --bp-panel: #11131a;
-  --bp-card: #151824;
-  --bp-border: #232637;
-  --bp-text: #e8eaf4;
-  --bp-muted: #a2a8c1;
-  --bp-brand: #7c5cff;
-  --bp-brand-600: #6a4cf0;
-  --bp-error: #ff4d4f;
-  --bp-shadow: 0 10px 30px rgba(2, 8, 23, 0.5);
-  color: var(--bp-text);
-  background: var(--bg); /* respect site bg behind panels */
-}
-
-/* Switch values when the site is set to light */
-html[data-theme="light"] .bp-wrap{
-  --bp-bg: #f7f8fc;
-  --bp-panel: #ffffff;
-  --bp-card: #ffffff;
-  --bp-border: #e6e8f0;
-  --bp-text: #0b0c0f;
-  --bp-muted: #4e556b;
-  --bp-brand: #5b7cff;
-  --bp-brand-600: #4b69f0;
-  --bp-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
-}
-
-/* Ensure all booking text follows the theme */
-.bp-title       { color: var(--bp-text); }
-.bp-subtitle    { color: var(--bp-muted); }
-.bp-badge       { color: var(--bp-brand); }
-.bp-help,
-.bp-slotSecondary,
-.bp-muted       { color: var(--bp-muted); }
-
-/* Panels/inputs already consume --bp-* tokens, just reaffirm */
-.bp-panel{
-  background: var(--bp-panel);
-  border: 1px solid var(--bp-border);
-  color: var(--bp-text);
-}
-
-/* Notice text helper (used below in JSX) */
-.bp-notice { color: var(--bp-muted); }
-
-/* Footer already uses var(--fg) and inherits. Make sure links follow. */
-footer a{ color: inherit; }

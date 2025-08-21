@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const MEETING_MIN = 30;
 const BUSINESS_TZ = process.env.NEXT_PUBLIC_BUSINESS_TZ || 'America/Los_Angeles';
@@ -41,7 +41,10 @@ function validateEmail(val: string): string | null {
 
 export default function Page() {
   const viewerTz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // may be corrected after first fetch
+  const [earliestAllowedDate, setEarliestAllowedDate] = useState<string | null>(null);
   const [slots, setSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', notes: '' });
@@ -53,21 +56,37 @@ export default function Page() {
   const phTzShort = useMemo(() => (PH_TZ ? getTzShort(PH_TZ) : ''), []);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     fetch(`/api/availability?date=${date}&viewerTz=${encodeURIComponent(viewerTz)}`)
       .then(r => r.json())
-      .then(d => setSlots(d.slots || []))
-      .finally(() => setLoading(false));
+      .then(d => {
+        if (cancelled) return;
+        const minFromApi: string | undefined = d.earliestAllowedDate;
+        if (minFromApi) {
+          setEarliestAllowedDate(minFromApi);
+          // If user landed on a blocked day (today/past), auto-bump to earliest allowed.
+          if (date < minFromApi) {
+            setDate(minFromApi);
+            return; // next effect run will fetch slots for the corrected date
+          }
+        }
+        setSlots(d.slots || []);
+      })
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
   }, [date, viewerTz]);
 
   function onEmailChange(value: string) {
     setForm({ ...form, email: value });
     if (touched.email) setEmailError(validateEmail(value));
   }
+
   function onEmailBlur() {
     setTouched(t => ({ ...t, email: true }));
     setEmailError(validateEmail(form.email));
   }
+
   const nameError = touched.name && !form.name.trim() ? 'Name is required.' : null;
   const formValid = !validateEmail(form.email) && !!form.name.trim();
 
@@ -98,14 +117,31 @@ export default function Page() {
     alert('Request sent! You’ll get a confirmation once approved.');
   }
 
+  // Open native date picker when clicking the left icon/wrapper
+  function openDatePicker() {
+    const el = dateInputRef.current;
+    if (!el) return;
+    const withPicker = el as HTMLInputElement & { showPicker?: () => void };
+    if (typeof withPicker.showPicker === 'function') {
+      withPicker.showPicker();
+    } else {
+      el.focus();
+      el.click();
+    }
+  }
+
+  function onDateKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openDatePicker();
+    }
+  }
+
   return (
     <main className="bp-wrap">
       <header className="bp-header">
         <div>
           <h1 className="bp-title">Request an online consultation</h1>
-          <p className="bp-subtitle">
-            Choose a {MEETING_MIN}-minute slot. Shown in your local time and Guitar Harbour time.
-          </p>
         </div>
         <div className="bp-badges">
           <span className="bp-badge">You: {viewerTz} ({tzShort})</span>
@@ -117,12 +153,25 @@ export default function Page() {
       <section className="bp-panel">
         <label className="bp-label">
           <span>Date</span>
-          <input
-            className="bp-date"
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-          />
+          {/* Clickable left-icon wrap */}
+          <div
+            className="bp-dateField"
+            onClick={openDatePicker}
+            onKeyDown={onDateKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label="Open calendar"
+          >
+            <input
+              ref={dateInputRef}
+              className="bp-date"
+              type="date"
+              value={date}
+              min={earliestAllowedDate ?? undefined}
+              onChange={e => setDate(e.target.value)}
+              aria-label="Select a date"
+            />
+          </div>
         </label>
 
         <div className="bp-formGrid">
@@ -178,12 +227,11 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Notice at collection (CPRA) */}
         <p className="bp-notice" style={{ fontSize: 12, marginTop: 6, lineHeight: 1.4 }}>
           We collect your name, email, and booking notes to schedule your consultation and communicate about your request.
           We retain this information only as long as needed to provide the service. See our{' '}
-          <a href="/privacy">Privacy Policy</a>. To opt out of sale/sharing, visit{' '}
-          <a href="/do-not-sell">Do Not Sell or Share My Personal Information</a>.
+          <a href="/privacy"><strong>Privacy Policy</strong></a>. To opt out of sale/sharing, visit{' '}
+          <a href="/do-not-sell"><strong>Do Not Sell or Share My Personal Information</strong></a>.
         </p>
       </section>
 

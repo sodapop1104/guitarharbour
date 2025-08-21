@@ -6,16 +6,14 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header>
+    <header className="site-header">{/* <-- add this class */}
       <div className="nav container-fluid">
         <div className="nav-left">
           <ThemeToggle />
         </div>
 
         <div className="logo" aria-label="Guitar Harbour">
-          {/* Dark default */}
           <img className="logo-dark" src="/assets/logo.svg" alt="" aria-hidden="true" />
-          {/* Light variant */}
           <img className="logo-light" src="/assets/logo1.svg" alt="" aria-hidden="true" />
           <strong>Guitar Harbour</strong>
         </div>
@@ -32,9 +30,9 @@ export default function Header() {
           </button>
           <ul id="menu" className={open ? "open" : ""}>
             <li><a href="#services">Services</a></li>
-            <li><a href="#repairs">Repairs</a></li>
             <li><a href="#shop">Shop</a></li>
             <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>    
           </ul>
         </nav>
       </div>

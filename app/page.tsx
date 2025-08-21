@@ -1,7 +1,7 @@
-// app/page.tsx
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ServicesAndPricing from "@/components/ServicesAndPricing";
+import ConsultationCTA from "@/components/ConsultationCTA";
 import Shop from "@/components/Shop";
 import Reviews from "@/components/Reviews";
 import About from "@/components/About";
@@ -15,6 +15,8 @@ export default function Page() {
       <main>
         <Hero />
         <ServicesAndPricing />
+        {/* NEW: CTA lives directly after Services & Pricing */}
+        <ConsultationCTA />
         <Shop />
         <section id="about"><div className="container"><About /></div></section>
         <Contact />
