@@ -679,60 +679,124 @@ html[data-theme="light"] .bp-title {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
-.gh-thumb {
-  border: 0; padding: 0; background: none; cursor: pointer;
+.gh-thumb { border: 0; padding: 0; background: none; cursor: pointer; }
+
+/* Fixed-ratio thumbnail box for next/image fill */
+.gh-thumb-wrap {
+  position: relative;
+  width: 100%;
+  /* 3:2 ratio (adjust to taste) */
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 8px;
 }
 .gh-thumb-img {
-  width: 100%; height: auto; display: block; border-radius: 8px;
+  object-fit: cover;              /* tidy cropped thumbs */
   transition: transform .15s ease;
 }
 .gh-thumb:hover .gh-thumb-img { transform: scale(1.03); }
 
 /* --- Lightbox --- */
 .gh-lightbox {
-  position: fixed; inset: 0; background: rgba(0,0,0,.8);
-  display: grid; place-items: center; z-index: 1000; padding: 16px;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.82);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+  overflow: hidden; /* prevent scrollbars on desktop */
 }
+
 .gh-lightbox-inner {
   position: relative;
-  width: 100%;
-  max-width: 1200px;
+  width: min(96vw, 1200px);
 }
 
-/* Wrapper that defines the viewport box for the Image (fit-to-screen) */
+.gh-lightbox-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  transform: none;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 40px;
+}
+.gh-lightbox-close:hover { background: rgba(0,0,0,.7); }
+
+/* Lightbox image viewport — leave room for caption/close */
 .gh-lightbox-img-wrap {
   position: relative;
-  width: 90vw;
-  height: 90vh;
+  width: min(92vw, 1200px);
+  height: 88vh;
   margin: 0 auto;
 }
-
-/* next/image with fill uses object-fit */
 .gh-lightbox-img {
-  object-fit: contain !important; /* keep whole image visible */
+  object-fit: contain !important; /* keep full image visible */
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
 }
 
-.gh-lightbox-caption {
-  color: #fff; text-align: center; margin-top: 8px; opacity: .9; font-size: .95rem;
-}
-
-.gh-lightbox-close,
+/* Arrows inside the image area */
 .gh-lightbox-prev,
 .gh-lightbox-next {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgba(0,0,0,.55); color: #fff; border: 0; width: 40px; height: 40px;
-  border-radius: 999px; cursor: pointer; font-size: 24px; line-height: 40px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 40px;
 }
-.gh-lightbox-close { top: -14px; right: -14px; transform: none; }
-.gh-lightbox-prev { left: -12px; }
-.gh-lightbox-next { right: -12px; }
-.gh-lightbox-close:hover,
+.gh-lightbox-prev { left: 8px; }
+.gh-lightbox-next { right: 8px; }
 .gh-lightbox-prev:hover,
 .gh-lightbox-next:hover { background: rgba(0,0,0,.7); }
 
+.gh-lightbox-caption {
+  color: #fff;
+  text-align: center;
+  margin-top: 8px;
+  opacity: .95;
+  font-size: .95rem;
+}
+
+/* Buttons under the grid */
+.gh-gallery-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.gh-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.25);
+  background: #111; /* tweak to brand color if desired */
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.gh-btn:hover { background: #1a1a1a; }
+.gh-btn:focus { outline: 2px solid #555; outline-offset: 2px; }
+.gh-btn-secondary {
+  background: transparent;
+  border-color: rgba(255,255,255,.35);
+}
+.gh-btn-secondary:hover { background: rgba(255,255,255,.06); }
+
 @media (max-width: 640px) {
-  .gh-lightbox-prev { left: 6px; }
-  .gh-lightbox-next { right: 6px; }
+  .gh-lightbox-prev { left: 4px; }
+  .gh-lightbox-next { right: 4px; }
 }
