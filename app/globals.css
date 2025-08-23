@@ -104,8 +104,8 @@ header.site-header {
 .logo {
   position: absolute;
   left: 50%;
-  top: 50%;                         /* ⬅️ center vertically */
-  transform: translate(-50%, -50%); /* ⬅️ center both axes */
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -113,15 +113,30 @@ header.site-header {
 }
 .logo img { height:48px; width:auto; }
 
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  align-items: flex-start; /* keep subtitle aligned under the wordmark */
+}
+
 /* Wordmark beside the icon */
 .logo-word {
   font-family: "Poppins", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
   font-weight: 700;
-  font-size: clamp(24px, 2.4vw, 34px); /* bigger & responsive */
+  font-size: clamp(24px, 2.4vw, 34px);
   letter-spacing: -0.4px;
-  color: var(--fg);   /* auto dark/light */
+  color: var(--fg);
   line-height: 1;
   white-space: nowrap;
+}
+
+/* Subtitle under the wordmark */
+.logo-sub {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.9;
+  line-height: 1.2;
 }
 
 /* Slightly tighter spacing on small screens */
@@ -130,51 +145,11 @@ header.site-header {
   .logo-word { font-size: clamp(20px, 5vw, 28px); }
 }
 
-
 /* Logo theme switching */
 .logo-light { display: none; }
 .logo-dark  { display: block; }
 html[data-theme="light"] .logo-dark  { display: none; }
 html[data-theme="light"] .logo-light { display: block; }
-
-/* Grid inside .logo to keep icon beside word and center subtitle under both */
-.logo-stack {
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 12px;
-  /* shrink to intrinsic width so subtitle can center perfectly */
-  width: max-content;
-  margin-inline: auto;
-}
-
-/* Put both theme icons in the same cell (row 1, col 1) */
-.logo-stack .logo-dark,
-.logo-stack .logo-light {
-  grid-column: 1;
-  grid-row: 1;
-  height: 48px;
-  width: auto;
-}
-
-/* Wordmark sits to the right of the icon (row 1, col 2) */
-.logo-stack .logo-word {
-  grid-column: 2;
-  grid-row: 1;
-  white-space: nowrap; /* keep wordmark on one line */
-}
-
-/* Subtitle spans both columns and centers under the row above */
-.logo-stack .logo-sub {
-  grid-column: 1 / -1; /* span both columns */
-  grid-row: 2;
-  justify-self: center;
-  font-size: clamp(12px, 1.6vw, 16px);
-  font-weight: 400;
-  opacity: .9;
-  margin-top: 4px; /* subtle gap below wordmark */
-}
 
 /* Menu right; toggle after it */
 nav { margin-left: auto; }
@@ -406,7 +381,7 @@ body.anim .stagger.in > *:nth-child(6){ transition-delay: .36s; }
   --bp-shadow: 0 10px 30px rgba(2, 8, 23, 0.5);
 
   color: var(--bp-text);
-  background: var(--bg); /* respect site bg behind panels */
+  background: var(--bg);
 }
 
 /* If the OS prefers light (fallback for first paint) */
@@ -458,7 +433,7 @@ html[data-theme="light"] .bp-wrap{
   display: grid;
   gap: 12px;
   max-width: 760px;
-  margin: 0 auto 18px;  /* center the block */
+  margin: 0 auto 18px;
   padding: 0 18px;
   justify-items: center;
   text-align: center;
@@ -576,7 +551,6 @@ html[data-theme="light"] .bp-title { text-shadow: none; }
       transparent 0%,
       color-mix(in oklab, var(--fg) 16%, transparent) 0.5%,
       transparent 1.2%) repeat-y;
-  /* ~6 strings */
   background-size: 100% 16.66%;
   opacity: .28;
   pointer-events: none;
@@ -607,13 +581,13 @@ html[data-theme="light"] .bp-title { text-shadow: none; }
 .pick-list > li::before {
   content: "";
   position: absolute; left: 0; top: .48em;
-  width: 9px; height: 9px; /* smaller pick */
+  width: 9px; height: 9px;
   border-radius: 40% 60% 70% 30% / 40% 40% 60% 60%;
   background: color-mix(in oklab, var(--fg) 70%, var(--bg));
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--fg) 26%, var(--bg));
   transform: rotate(10deg);
 }
-.pick-list .pick-list { margin-top: 6px; } /* nested pick lists */
+.pick-list .pick-list { margin-top: 6px; }
 
 /* 4) Pick button variant (compact) */
 .btn.pick {
@@ -652,7 +626,6 @@ body.anim .reveal.strum.in { transform: none; }
   transition: background-color .2s ease, transform .12s ease;
   cursor: pointer;
 
-  /* Vector calendar glyph (mask so we can recolor) */
   -webkit-mask: url("data:image/svg+xml;utf8,\
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
     <path d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12 8H5v8.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5V10ZM6 8h12V6H6v2Z'/>\
@@ -669,11 +642,11 @@ body.anim .reveal.strum.in { transform: none; }
 .bp-date {
   display: block;
   width: 100%;
-  height: 48px;               /* consistent tap target */
-  font-size: 16px;            /* prevent iOS zoom */
+  height: 48px;
+  font-size: 16px;
   -webkit-appearance: none; appearance: none;
-  padding-left: 44px;         /* room for left icon */
-  background-image: none;     /* normalize */
+  padding-left: 44px;
+  background-image: none;
 }
 .bp-date::-webkit-calendar-picker-indicator { opacity: 0; pointer-events: none; }
 
@@ -683,8 +656,6 @@ body.anim .reveal.strum.in { transform: none; }
 }
 
 /* ==== FINAL HARD FIX: booking title must be readable in dark ==== */
-
-/* If any ancestor applied opacity/filter/blend, neutralize it on the booking header */
 .bp-header {
   position: relative;
   z-index: 10;
@@ -693,24 +664,18 @@ body.anim .reveal.strum.in { transform: none; }
   filter: none !important;
   mix-blend-mode: normal !important;
 }
-
-/* Un-dim anything inside the header */
 .bp-header * {
   opacity: 1 !important;
   filter: none !important;
   mix-blend-mode: normal !important;
   -webkit-text-stroke: 0 !important;
 }
-
-/* Force max-contrast title color */
 .bp-title {
   position: relative;
-  color: #fff !important;                 /* hard white */
-  text-shadow: none !important;           /* remove darkening */
-  -webkit-text-fill-color: currentColor;  /* bypass text-fill quirks */
+  color: #fff !important;
+  text-shadow: none !important;
+  -webkit-text-fill-color: currentColor;
 }
-
-/* In light theme, return to dark heading */
 html[data-theme="light"] .bp-title {
   color: #0a0b0e !important;
 }
@@ -718,30 +683,24 @@ html[data-theme="light"] .bp-title {
 /* --- Gallery --- */
 .gh-gallery { padding: 2rem 1rem; }
 .gh-gallery-title { font-weight: 700; font-size: 1.5rem; margin-bottom: 1rem; text-align: center; }
-
 .gh-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
 .gh-thumb { border: 0; padding: 0; background: none; cursor: pointer; }
-
-/* Fixed-ratio thumbnail box for next/image fill */
 .gh-thumb-wrap {
   position: relative;
   width: 100%;
-  /* 3:2 ratio (adjust to taste) */
   aspect-ratio: 3 / 2;
   overflow: hidden;
   border-radius: 8px;
 }
 .gh-thumb-img {
-  object-fit: cover;              /* tidy cropped thumbs */
+  object-fit: cover;
   transition: transform .15s ease;
 }
 .gh-thumb:hover .gh-thumb-img { transform: scale(1.03); }
-
-/* --- Lightbox --- */
 .gh-lightbox {
   position: fixed;
   inset: 0;
@@ -750,14 +709,12 @@ html[data-theme="light"] .bp-title {
   place-items: center;
   z-index: 1000;
   padding: 16px;
-  overflow: hidden; /* prevent scrollbars on desktop */
+  overflow: hidden;
 }
-
 .gh-lightbox-inner {
   position: relative;
   width: min(96vw, 1200px);
 }
-
 .gh-lightbox-close {
   position: absolute;
   top: -10px;
@@ -774,8 +731,6 @@ html[data-theme="light"] .bp-title {
   line-height: 40px;
 }
 .gh-lightbox-close:hover { background: rgba(0,0,0,.7); }
-
-/* Lightbox image viewport — leave room for caption/close */
 .gh-lightbox-img-wrap {
   position: relative;
   width: min(92vw, 1200px);
@@ -783,12 +738,10 @@ html[data-theme="light"] .bp-title {
   margin: 0 auto;
 }
 .gh-lightbox-img {
-  object-fit: contain !important; /* keep full image visible */
+  object-fit: contain !important;
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
 }
-
-/* Arrows inside the image area */
 .gh-lightbox-prev,
 .gh-lightbox-next {
   position: absolute;
@@ -808,7 +761,6 @@ html[data-theme="light"] .bp-title {
 .gh-lightbox-next { right: 8px; }
 .gh-lightbox-prev:hover,
 .gh-lightbox-next:hover { background: rgba(0,0,0,.7); }
-
 .gh-lightbox-caption {
   color: #fff;
   text-align: center;
@@ -816,8 +768,6 @@ html[data-theme="light"] .bp-title {
   opacity: .95;
   font-size: .95rem;
 }
-
-/* Buttons under the grid */
 .gh-gallery-actions {
   display: flex;
   justify-content: center;
@@ -826,7 +776,7 @@ html[data-theme="light"] .bp-title {
 .gh-btn {
   appearance: none;
   border: 1px solid rgba(255,255,255,.25);
-  background: #111; /* tweak to brand color if desired */
+  background: #111;
   color: #fff;
   padding: 10px 14px;
   border-radius: 10px;
@@ -840,13 +790,10 @@ html[data-theme="light"] .bp-title {
   border-color: rgba(255,255,255,.35);
 }
 .gh-btn-secondary:hover { background: rgba(255,255,255,.06); }
-
 @media (max-width: 640px) {
   .gh-lightbox-prev { left: 4px; }
   .gh-lightbox-next { right: 4px; }
 }
-
-/* --- Override grayscale / black & white effect for Gallery --- */
 .gh-gallery img,
 .gh-gallery .gh-thumb-img,
 .gh-gallery .gh-lightbox-img {
