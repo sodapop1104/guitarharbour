@@ -12,13 +12,32 @@ export default function Header() {
           <ThemeToggle />
         </div>
 
-        {/* Center logo + wordmark */}
+        {/* Logo block with grid layout */}
         <div className="logo" aria-label="Guitar Harbour">
-          <img className="logo-dark" src="/assets/logo.svg" alt="" aria-hidden="true" />
-          <img className="logo-light" src="/assets/logo1.svg" alt="" aria-hidden="true" />
-          <span className="logo-word">Guitar Harbour</span>
+          <div className="logo-stack">
+            {/* Logo icons (theme toggle switches them) */}
+            <img
+              className="logo-dark"
+              src="/assets/logo.svg"
+              alt="Guitar Harbour logo"
+            />
+            <img
+              className="logo-light"
+              src="/assets/logo1.svg"
+              alt="Guitar Harbour logo"
+            />
+
+            {/* Wordmark */}
+            <span className="logo-word">Guitar Harbour</span>
+
+            {/* Subtitle */}
+            <span className="logo-sub">
+              Philippines&nbsp;| Los&nbsp;Angeles, CA
+            </span>
+          </div>
         </div>
 
+        {/* Navigation */}
         <nav aria-label="Primary">
           <button
             className="nav-toggle"
@@ -30,10 +49,18 @@ export default function Header() {
             Menu
           </button>
           <ul id="menu" className={open ? "open" : ""}>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#shop">Shop</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>    
+            <li>
+              <a href="#services">Services</a>
+            </li>
+            <li>
+              <a href="#shop">Shop</a>
+            </li>
+            <li>
+              <a href="#about">About</a>
+            </li>
+            <li>
+              <a href="#contact">Contact</a>
+            </li>
           </ul>
         </nav>
       </div>

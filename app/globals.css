@@ -8,7 +8,7 @@
   --muted: #999;
   --line: #111;
   --surface: #050505;
-  --header-h: 64px;
+  --header-h: 104px;
 
   /* Components */
   --header-bg: rgba(0,0,0,.8);
@@ -102,8 +102,14 @@ header.site-header {
 }
 .nav { position: relative; display:flex; align-items:center; height: var(--header-h); }
 .logo {
-  position:absolute; left:50%; transform: translateX(-50%);
-  display:flex; align-items:center; gap:12px; min-width:0;
+  position: absolute;
+  left: 50%;
+  top: 50%;                         /* ⬅️ center vertically */
+  transform: translate(-50%, -50%); /* ⬅️ center both axes */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 .logo img { height:48px; width:auto; }
 
@@ -130,6 +136,45 @@ header.site-header {
 .logo-dark  { display: block; }
 html[data-theme="light"] .logo-dark  { display: none; }
 html[data-theme="light"] .logo-light { display: block; }
+
+/* Grid inside .logo to keep icon beside word and center subtitle under both */
+.logo-stack {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 12px;
+  /* shrink to intrinsic width so subtitle can center perfectly */
+  width: max-content;
+  margin-inline: auto;
+}
+
+/* Put both theme icons in the same cell (row 1, col 1) */
+.logo-stack .logo-dark,
+.logo-stack .logo-light {
+  grid-column: 1;
+  grid-row: 1;
+  height: 48px;
+  width: auto;
+}
+
+/* Wordmark sits to the right of the icon (row 1, col 2) */
+.logo-stack .logo-word {
+  grid-column: 2;
+  grid-row: 1;
+  white-space: nowrap; /* keep wordmark on one line */
+}
+
+/* Subtitle spans both columns and centers under the row above */
+.logo-stack .logo-sub {
+  grid-column: 1 / -1; /* span both columns */
+  grid-row: 2;
+  justify-self: center;
+  font-size: clamp(12px, 1.6vw, 16px);
+  font-weight: 400;
+  opacity: .9;
+  margin-top: 4px; /* subtle gap below wordmark */
+}
 
 /* Menu right; toggle after it */
 nav { margin-left: auto; }
@@ -799,4 +844,14 @@ html[data-theme="light"] .bp-title {
 @media (max-width: 640px) {
   .gh-lightbox-prev { left: 4px; }
   .gh-lightbox-next { right: 4px; }
+}
+
+/* --- Override grayscale / black & white effect for Gallery --- */
+.gh-gallery img,
+.gh-gallery .gh-thumb-img,
+.gh-gallery .gh-lightbox-img {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
 }
