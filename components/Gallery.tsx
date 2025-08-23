@@ -13,7 +13,7 @@ const IMAGES: Img[] = [
   { src: "/assets/gallery/5.jpg",  w: 1200, h: 800, alt: "5" },
   { src: "/assets/gallery/6.jpg",  w: 1200, h: 800, alt: "6" },
   { src: "/assets/gallery/7.jpg",  w: 1200, h: 800, alt: "7" },
-  { src: "/assets/gallery/8.jpg",  w: 1200, h: 800, alt: "8" },   // <- removed trailing space
+  { src: "/assets/gallery/8.jpg",  w: 1200, h: 800, alt: "8" },
   { src: "/assets/gallery/9.jpg",  w: 1200, h: 800, alt: "9" },
   { src: "/assets/gallery/10.jpg", w: 1200, h: 800, alt: "10" },
   { src: "/assets/gallery/11.jpg", w: 1200, h: 800, alt: "11" },
@@ -59,9 +59,7 @@ export default function Gallery() {
               width={img.w}
               height={img.h}
               className="gh-thumb-img"
-              // Help the browser choose the right size
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              // Prioritize first few thumbs for snappier UX
               priority={i < 3}
             />
           </button>
@@ -73,12 +71,19 @@ export default function Gallery() {
           <div className="gh-lightbox-inner" onClick={(e) => e.stopPropagation()}>
             <button className="gh-lightbox-close" onClick={close} aria-label="Close">✕</button>
             <button className="gh-lightbox-prev" onClick={prev} aria-label="Previous">‹</button>
-            <img
-              src={IMAGES[idx].src}
-              alt={IMAGES[idx].alt}
-              className="gh-lightbox-img"
-              loading="eager"
-            />
+
+            {/* Optimized lightbox image */}
+            <div className="gh-lightbox-img-wrap">
+              <Image
+                src={IMAGES[idx].src}
+                alt={IMAGES[idx].alt}
+                fill
+                priority
+                sizes="90vw"
+                className="gh-lightbox-img"
+              />
+            </div>
+
             <button className="gh-lightbox-next" onClick={next} aria-label="Next">›</button>
             <div className="gh-lightbox-caption">{IMAGES[idx].alt}</div>
           </div>

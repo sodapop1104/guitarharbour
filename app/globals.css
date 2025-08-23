@@ -694,15 +694,30 @@ html[data-theme="light"] .bp-title {
   display: grid; place-items: center; z-index: 1000; padding: 16px;
 }
 .gh-lightbox-inner {
-  position: relative; max-width: min(96vw, 1200px); width: 100%;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
 }
+
+/* Wrapper that defines the viewport box for the Image (fit-to-screen) */
+.gh-lightbox-img-wrap {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  margin: 0 auto;
+}
+
+/* next/image with fill uses object-fit */
 .gh-lightbox-img {
-  width: 100%; height: auto; display: block; border-radius: 10px;
+  object-fit: contain !important; /* keep whole image visible */
+  border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
 }
+
 .gh-lightbox-caption {
   color: #fff; text-align: center; margin-top: 8px; opacity: .9; font-size: .95rem;
 }
+
 .gh-lightbox-close,
 .gh-lightbox-prev,
 .gh-lightbox-next {
@@ -716,6 +731,7 @@ html[data-theme="light"] .bp-title {
 .gh-lightbox-close:hover,
 .gh-lightbox-prev:hover,
 .gh-lightbox-next:hover { background: rgba(0,0,0,.7); }
+
 @media (max-width: 640px) {
   .gh-lightbox-prev { left: 6px; }
   .gh-lightbox-next { right: 6px; }
