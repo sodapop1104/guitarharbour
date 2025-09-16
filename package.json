@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prebuild": "node scripts/build-service-manifests.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "1.5.0",
@@ -34,3 +35,5 @@
     "typescript": "^5.9.2"
   }
 }
+
+

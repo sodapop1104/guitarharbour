@@ -18,7 +18,6 @@ export default function Page() {
         <ServicesAndPricing />
         {/* NEW: CTA lives directly after Services & Pricing */}
         <ConsultationCTA />
-        <Shop />
 
         {/* NEW: Gallery lives right after Shop */}
         <section id="gallery" className="container">

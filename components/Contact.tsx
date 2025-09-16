@@ -141,9 +141,9 @@ export default function Contact() {
             <p><strong>Social</strong></p>
             <div className="social-buttons">
               <a href="https://www.facebook.com/GuitarHarbourPH" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn facebook"><FaFacebook /> Facebook</a>
-              <a href="https://www.instagram.com/guitarharbourmanila/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-btn instagram"><FaInstagram /> Instagram</a>
+              <a href="https://www.instagram.com/guitarharbour.la/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-btn instagram"><FaInstagram /> Instagram</a>
               <a href="https://www.youtube.com/@bimbocanayon2308" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="social-btn youtube"><FaYoutube /> YouTube</a>
-              <a href="https://www.tiktok.com/@guitarharbourcustomshop" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="social-btn tiktok"><FaTiktok /> TikTok</a>
+              <a href="https://www.tiktok.com/@guitarharbourla" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="social-btn tiktok"><FaTiktok /> TikTok</a>
             </div>
           </div>
         </div>
