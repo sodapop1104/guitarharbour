@@ -3,53 +3,81 @@
 
 import React, { useEffect, useState } from "react";
 
-function readCookie(name: string) {
-  const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return m ? decodeURIComponent(m[2]) : null;
-}
-
-type GeoPriceProps = {
-  usd: string | number;
-  contactText?: string;
-  contactHref?: string;
-  loadingFallback?: React.ReactNode;
+type Props = {
+  usd?: number;
+  usdRange?: [number, number];
+  suffix?: string;
+  className?: string;
 };
 
-function GeoPrice({
-  usd,
-  contactText = "Contact for more info about pricing",
-  contactHref = "/contact",
-  loadingFallback = null,
-}: GeoPriceProps) {
-  const [country, setCountry] = useState<string | null>(null);
-
+function useCountryCode() {
+  const [code, setCode] = useState<string | null>(null);
   useEffect(() => {
-    const c = readCookie("country_code");
-    setCountry((c || "").toUpperCase());
+    const m = document.cookie.match(/(?:^| )country_code=([^;]+)/);
+    setCode(m ? decodeURIComponent(m[1]).toUpperCase() : "");
   }, []);
+  return code;
+}
 
-  if (country === null) {
-    return <>{loadingFallback}</>;
-  }
+function formatUSD(n: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
 
-  if (country === "PH") {
+export default function GeoPrice({
+  usd,
+  usdRange,
+  suffix = "USD",
+  className,
+}: Props) {
+  const country = useCountryCode();
+  if (country === null) return null;
+
+  const isPH = country === "PH";
+  const hasSingle = typeof usd === "number" && !Number.isNaN(usd);
+  const hasRange =
+    Array.isArray(usdRange) &&
+    usdRange.length === 2 &&
+    typeof usdRange[0] === "number" &&
+    typeof usdRange[1] === "number";
+
+  if (isPH) {
     return (
-      <div className="geo-price geo-price--ph">
-        <p>{contactText}</p>
-        <a className="btn" href={contactHref}>
-          Contact Us
-        </a>
+      <div
+        className={className}
+        style={{ color: "var(--muted)", fontSize: "0.95rem", marginBottom: "0.5rem" }}
+      >
+        Contact us for pricing
       </div>
     );
   }
 
-  return (
-    <div className="geo-price geo-price--usd">
-      <p className="price">
-        Price: {typeof usd === "number" ? `$${usd.toFixed(2)}` : String(usd)} USD
-      </p>
-    </div>
-  );
-}
+  if (hasSingle) {
+    return (
+      <div
+        className={className}
+        style={{ color: "var(--muted)", fontWeight: 600, marginBottom: "0.5rem" }}
+      >
+        {"\u00A0"}
+        {formatUSD(usd!)} {suffix}
+      </div>
+    );
+  }
 
-export default GeoPrice; // ✅ default export (must match `import GeoPrice from "./GeoPrice"`)
+  if (hasRange) {
+    return (
+      <div
+        className={className}
+        style={{ color: "var(--muted)", fontWeight: 600, marginBottom: "0.5rem" }}
+      >
+        {"\u00A0"}
+        {formatUSD(usdRange![0])}–{formatUSD(usdRange![1])} {suffix}
+      </div>
+    );
+  }
+
+  return null;
+}

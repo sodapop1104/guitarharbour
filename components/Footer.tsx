@@ -15,7 +15,7 @@ export default function Footer() {
         >
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <span>© 2025 Guitar Harbour</span>
-            <span className="muted">Temple City, CA</span>
+            <span className="muted">Temple City, CA, USA | Manila, Philippines</span>
           </div>
 
           <div className="footer-links" style={{ display: "flex", gap: 8 }}>

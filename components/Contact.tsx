@@ -31,7 +31,6 @@ export default function Contact() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // final client-side guard
     const nextErrors = {
       name: formData.name.trim() ? "" : "Please enter your name.",
       email: !formData.email.trim()
@@ -67,7 +66,7 @@ export default function Contact() {
       setStatus("error");
       setServerMsg(err instanceof Error ? err.message : "Unable to send right now. Please try again.");
     } finally {
-      setTimeout(() => setStatus("idle"), 3000); // softly reset state
+      setTimeout(() => setStatus("idle"), 3000);
     }
   };
 
@@ -133,7 +132,17 @@ export default function Contact() {
 
           {/* Shop Details */}
           <div className="reveal" data-anim="right" aria-label="Shop details">
-            <p><strong>Location</strong><br />Based in Temple City, California, we serve musicians across the San Gabriel Valley and nearby areas. Our pickup-and-delivery service handles expert guitar repairs, setups, and modifications — we collect your instrument, care for it, and return it ready to play.</p>
+            <p><strong>Location</strong></p>
+            <p>
+              <strong>Temple City, CA</strong><br />
+              We serve musicians across the San Gabriel Valley and nearby areas. Our pickup-and-delivery service handles expert guitar repairs, setups, and modifications — we collect your instrument, care for it, and return it ready to play.
+            </p>
+            <p>
+              <strong>Manila, Philippines</strong><br />
+              1929 Tomas Mapua St., Sta. Cruz, Manila 1012<br />
+              Manila, Philippines
+            </p>
+
             <p><strong>Hours</strong><br />Available by appointment • Mon–Sat, 9AM–6PM</p>
             <p><strong>Email</strong><br /><span>contact@guitarharbour.com</span></p> {/* plain text so it won't open mail app */}
 

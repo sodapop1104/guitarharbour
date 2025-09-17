@@ -7,7 +7,7 @@ export default function ConsultationCTA() {
         <div className="reveal" data-anim="up" style={{ maxWidth: 680 }}>
           <h2 style={{ marginBottom: 12 }}>Book an Online Consultation</h2>
           <p className="muted" style={{ marginBottom: 14 }}>
-            Quick chat about your guitar’s setup, fretwork, or electronics. We’ll confirm scope, parts, and timelines.
+            Quick chat about your guitar’s setup, fretwork, or electronics. We’ll confirm scope, parts, pricing, and timelines.
           </p>
           <Link
             className="btn block"
