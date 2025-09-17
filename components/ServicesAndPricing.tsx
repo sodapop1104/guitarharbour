@@ -53,8 +53,7 @@ export default function ServicesAndPricing() {
           </h3>
           <div className="fret-divider" />
           <p className="muted" style={{ margin: 0 }}>
-            Your guitar deserves more than a quick fix. With premium tools and years of experience,
-            every adjustment is measured, tested, and refined—so it plays and sounds at its peak.
+            Your guitar deserves more than a quick fix—it deserves to feel unmistakably yours. Under the bench lights we work in careful, incremental passes—evaluate, adjust, play, refine—until tuning steadies, chords open up, and every note speaks clearly. The services below are how we get you there.
           </p>
         </div>
 

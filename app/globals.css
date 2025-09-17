@@ -14,6 +14,9 @@
   --header-bg: rgba(0,0,0,.8);
   --hero-a: #111;
   --hero-b: #000;
+
+  /* Measures */
+  --content-measure: 720px; /* unified width for headings + text */
 }
 
 html[data-theme="light"]{
@@ -175,23 +178,62 @@ nav a:hover { opacity:1; }
 }
 
 /* =========================
-   HERO
+   HERO (full-width title + copy)
 ========================= */
 .hero {
   padding: clamp(72px, 12vw, 108px) 0 clamp(56px, 8vw, 84px);
   background: radial-gradient(1200px 500px at 70% -10%, var(--hero-a) 0%, var(--hero-b) 60%);
   overflow: clip;
 }
-.hero h1 { font-size: clamp(34px, 6vw, 72px); line-height: 1.04; margin: 0 0 14px; letter-spacing: -.02em; }
-.hero p  { max-width: 680px; font-size: clamp(16px, 2.6vw, 20px); color:var(--muted); margin: 0 0 28px; }
-.hero-cta { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; max-width: 520px; }
-@media (min-width: 640px){ .hero-cta { display:flex; max-width:none; } }
+
+/* Title spans the full container and wraps nicely */
+.hero .container > h1 {
+  max-width: none;                 /* no width cap */
+  margin: 0 0 14px;                /* align to container left */
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Paragraphs also use full container width (no 720px cap) */
+.hero .container > p {
+  max-width: none;                 /* ← this is the key change */
+  margin-left: 0;
+  margin-right: 0;                 /* don't center */
+  text-align: left;
+  font-size: clamp(16px, 2.6vw, 20px);
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* Optional CTA row (if you use it) — left aligned */
+.hero-cta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 520px;
+  margin: 0;
+}
+@media (min-width: 640px){
+  .hero-cta { display: flex; max-width: none; }
+}
 
 /* =========================
    SECTIONS & TYPO
 ========================= */
 section { padding: clamp(56px, 8vw, 80px) 0; }
 h2 { font-size: clamp(22px, 3.6vw, 32px); margin:0 0 20px; letter-spacing:.02em; text-transform: uppercase; }
+
+/* Unify text measure across sections; keep LEFT alignment */
+section > .container > h2,
+section > .container > p,
+section > .container > .lead {
+  max-width: min(var(--content-measure), 100%);
+  margin-left: 0;
+  margin-right: auto;
+  text-align: left;
+}
 
 /* content lists — consistent bullets/colors/spacing */
 section ul { padding-left: 20px; margin: 8px 0 0; }
@@ -803,94 +845,163 @@ html[data-theme="light"] .bp-title {
   opacity: 1 !important;
 }
 
-.service-img {
-  margin-bottom: 0.75rem;
-  border-radius: 0.5rem;
-  overflow: hidden;
+/* =========================================================
+   GUITAR THEME EXTRAS (non-invasive, opt-in)
+========================================================= */
+
+/* A) Sunburst section background */
+.sunburst {
+  position: relative; isolation: isolate;
+  background:
+    radial-gradient(1200px 600px at 30% -20%,
+      var(--accent-amber) 0%,
+      color-mix(in oklab, var(--accent-amber) 40%, var(--accent-cherry)) 35%,
+      var(--accent-cherry) 60%,
+      var(--bg) 80%);
 }
-.service-img img {
-  display: block;
-  width: 100%;
-  height: auto;
+.sunburst::after{ /* subtle film grain */
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background: radial-gradient(circle at 20% 10%, transparent, rgba(0,0,0,.05) 60%),
+              repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.02) 2px 4px);
+  mix-blend-mode: overlay; opacity:.5;
 }
 
-.flip-card {
-  perspective: 1000px;
+/* B) Fretboard band + inlay dots (use on section wrappers) */
+.fretboard {
+  position: relative; isolation: isolate;
+  background:
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, var(--fg) 7%, var(--bg)) 0 88px,  /* fret space */
+      color-mix(in oklab, var(--fg) 18%, var(--bg)) 88px 89px); /* fret wire */
+}
+.fretboard::after{
+  /* inlay dots roughly at frets 3,5,7,9,12 (double), 15 */
+  content:"";
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(8px 8px at 22% 58%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%),
+    radial-gradient(8px 8px at 35% 58%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%),
+    radial-gradient(8px 8px at 48% 58%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%),
+    radial-gradient(8px 8px at 61% 58%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%),
+    radial-gradient(8px 8px at 74% 46%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%),
+    radial-gradient(8px 8px at 74% 70%, color-mix(in oklab, var(--fg) 70%, var(--bg)), transparent 60%);
+  opacity:.35;
 }
 
-.flip-card-inner {
+/* C) Amp grille card/section */
+.amp-grille {
+  background:
+    repeating-linear-gradient(0deg, var(--grill-dark) 0 2px, var(--grill-light) 2px 4px),
+    repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,.06) 6px 7px);
+  border: 1px solid color-mix(in oklab, var(--fg) 12%, var(--line));
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 10px 24px rgba(0,0,0,.16);
+}
+
+/* D) Cream binding (nice around images/cards) */
+.binding {
+  border: 3px solid var(--cream-binding);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.12),
+    0 1px 2px rgba(0,0,0,.18);
+  border-radius: 14px;
+}
+
+/* E) Pickguard look (use on small panels) */
+.pickguard {
+  background: color-mix(in oklab, var(--bg) 80%, #fff);
+  border: 1px solid color-mix(in oklab, var(--fg) 12%, var(--line));
+  border-radius: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
   position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
+}
+.pickguard::before,
+.pickguard::after{
+  /* tiny “screws” top-left / bottom-right */
+  content:""; position:absolute; width:6px; height:6px; border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #000, #0000 60%),
+              radial-gradient(circle, color-mix(in oklab, var(--fg) 60%, var(--bg)), transparent 60%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset;
+}
+.pickguard::before{ top:8px; left:10px; }
+.pickguard::after { right:10px; bottom:8px; }
+
+/* F) Mother-of-pearl text effect for small headings/badges */
+.pearl-text {
+  background: conic-gradient(from 0deg,
+    var(--pearl-a), var(--pearl-b), var(--pearl-c), var(--pearl-a));
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(255,255,255,.06);
 }
 
-.flip-card:hover .flip-card-inner,
-.flip-card:focus-within .flip-card-inner {
-  transform: rotateY(180deg);
+/* G) Nickel hardware chips/badges */
+.nickel {
+  background: linear-gradient(180deg, #fff1 0, #0002 100%),
+              linear-gradient(135deg, var(--metal-nickel), color-mix(in oklab, var(--metal-nickel) 70%, #000));
+  border: 1px solid color-mix(in oklab, var(--metal-nickel) 40%, #000);
+  color: #0b0c0f;
 }
 
-/* Front and back faces */
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  border-radius: 1rem;
-  overflow: hidden;
+/* H) Big string divider (6 strings across) */
+.string-divider {
+  position: relative; height: 18px; margin: 18px 0 8px;
+}
+.string-divider::before{
+  content:""; position:absolute; inset: 8px 0 auto 0; height:2px;
+  background:
+    repeating-linear-gradient(0deg,
+      color-mix(in oklab, var(--fg) 35%, var(--bg)) 0 1px,
+      transparent 1px 14px);
+  opacity:.55;
 }
 
-/* Front side */
-.flip-card-front {
-  background: var(--surface);
-  padding: 1rem;
-  display: grid;
-  gap: 0.5rem;
+/* I) Pick-shape utility (for buttons/cards) */
+.pick-shape {
+  border-radius: 900px 900px 700px 900px / 900px 900px 600px 900px;
 }
 
-/* Back side */
-.flip-card-back {
-  transform: rotateY(180deg);
-  background: #000;
+/* J) Cable underline for links (subtle wiggle) */
+.cable a, a.cable {
+  background:
+    linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+  text-decoration: none;
 }
-.flip-card-back img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ==== Services flip-card hard fixes (scoped to Services section) ==== */
-#services .flip-card {
-  position: relative;          /* create containing block for absolute faces */
-  display: block;
-  border-radius: 16px;         /* match your .card look */
-  overflow: clip;
-  /* keep your existing .card styles; this only adds the bits above */
+.cable a:hover, a.cable:hover {
+  background-size: 100% 2px;
+  text-underline-offset: 3px;
 }
 
-#services .flip-card-inner {
-  position: relative;
-  width: 100%;
-  min-height: 520px;           /* <— REQUIRED so faces have a height */
-  transform-style: preserve-3d;
-  transition: transform 0.6s;
+/* K) Stronger strings overlay variant */
+.strings--heavy::after {
+  opacity:.45;
+  background-size: 100% 14%;
 }
 
-@media (max-width: 640px){
-  #services .flip-card-inner { min-height: 480px; }
+/* L) Tortoise pickguard swatch (for chips or small cards) */
+.tortoise {
+  background:
+    radial-gradient(400px 200px at 20% 30%, color-mix(in oklab, var(--tortoise) 80%, #ffb703) 0%, transparent 60%),
+    radial-gradient(300px 240px at 70% 70%, color-mix(in oklab, var(--tortoise) 80%, #ff8c00) 0%, transparent 60%),
+    var(--tortoise);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.15);
 }
 
-/* Faces already absolute in your CSS; ensure they fill the box */
-#services .flip-card-front,
-#services .flip-card-back {
-  position: absolute;
-  inset: 0;
+/* M) “Knob” badge (small circular counter/label) */
+.knob {
+  display:inline-grid; place-items:center;
+  width:32px; height:32px; border-radius:999px; font-weight:700;
+  background:
+    conic-gradient(from 90deg, #0000, rgba(255,255,255,.08)),
+    radial-gradient(circle at 35% 35%, #fff2, #0000 60%),
+    linear-gradient(180deg, #fff1, #0003);
+  border:1px solid color-mix(in oklab, var(--fg) 20%, var(--line));
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.06);
 }
 
-/* Make sure images on the back aren’t forced grayscale by global rule */
-#services .flip-card-back img {
-  filter: none !important;
-  -webkit-filter: none !important;
-  mix-blend-mode: normal !important;
+/* N) Subtle “pluck” hover for interactive cards/buttons */
+.pluck:hover{
+  transform: translateY(-3px) rotate(-.15deg);
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
 }
