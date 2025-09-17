@@ -46,18 +46,13 @@ function useServiceImages(serviceKey: string) {
       }
       const url = `${ASSET_BASE}/${encodeURI(folder)}/manifest.json`;
       try {
-        console.info("[Services] fetching manifest:", url);
         const res = await fetch(url, { cache: "force-cache" });
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
         const data = (await res.json()) as Manifest;
         const arr = Array.isArray(data.images) ? data.images : [];
         const full = arr.map((n) => `${ASSET_BASE}/${encodeURI(folder)}/${encodeURI(n)}`);
-        if (!ignore) {
-          setImages(full);
-          console.info("[Services] images:", full);
-        }
-      } catch (err) {
-        console.warn("[Services] manifest load failed:", url, err);
+        if (!ignore) setImages(full);
+      } catch {
         if (!ignore) setImages([]);
       }
     })();
@@ -69,9 +64,7 @@ function useServiceImages(serviceKey: string) {
   return { loading: images === null, sources: images ?? [] };
 }
 
-/** Back face with lightweight carousel (arrows + dots)
- *  Ensures a RELATIVE wrapper inside the absolute back face.
- */
+/** Back face with lightweight carousel (arrows + dots) */
 function CardBackMedia({ serviceKey, alt }: { serviceKey: string; alt: string }) {
   const { loading, sources } = useServiceImages(serviceKey);
   const [idx, setIdx] = useState(0);
@@ -79,7 +72,7 @@ function CardBackMedia({ serviceKey, alt }: { serviceKey: string; alt: string })
   const hasImages = sources.length > 0;
   const src = hasImages ? sources[idx] : `${ASSET_BASE}/placeholder.jpg`;
 
-  // allow keyboard left/right when card area is focused
+  // keyboard left/right when card is focused
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (!hasImages) return;
@@ -90,43 +83,22 @@ function CardBackMedia({ serviceKey, alt }: { serviceKey: string; alt: string })
     return () => window.removeEventListener("keydown", onKey);
   }, [hasImages, sources.length]);
 
-  // If you suspect next/image optimization on local files, you can switch to native <img>
-  const USE_NATIVE_IMG_FALLBACK = false;
-
   return (
-    <div className="flip-card-back">
+    <div className="flip-card-back" style={{ position: "relative" }}>
       <div
         className="back-media-wrap"
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
-          // keeps aspect if parent ends up auto-height somewhere:
-          // comment out if you prefer full back face fill from parent height
-          // aspectRatio: "3 / 2",
-        }}
+        style={{ position: "relative", width: "100%", height: "100%" }}
       >
         {!loading && (
-          USE_NATIVE_IMG_FALLBACK ? (
-            // Native <img> fallback (bypasses next/image entirely)
-            <img
-              src={src}
-              alt={alt}
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-              onError={() => console.warn("[Services] <img> failed:", src)}
-            />
-          ) : (
-            <Image
-              src={src}
-              alt={alt}
-              fill
-              sizes="(max-width: 768px) 100vw, 600px"
-              style={{ objectFit: "cover" }}
-              onError={() => console.warn("[Services] <Image> failed:", src)}
-              // unoptimized // <- uncomment if you want to skip next/image optimizations
-              priority={serviceKey === "basic-setup"} // example: prioritize Basic Setup
-            />
-          )
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 600px"
+            style={{ objectFit: "cover" }}
+            onError={() => { /* silent */ }}
+            priority={serviceKey === "basic-setup"}
+          />
         )}
 
         {sources.length > 1 && (
@@ -203,11 +175,20 @@ function CardFront({
       <h3 style={{ marginBottom: 6 }}>{title}</h3>
       <div className="price-row" style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".5rem" }}>
         {priceUSD !== undefined ? (
-          <GeoPrice usd={priceUSD} contactText="Contact for local pricing" contactHref="/contact" />
+          <GeoPrice
+            usd={priceUSD}
+            contactText="Contact for local pricing"
+            contactHref="/contact"
+          />
         ) : isPH === null ? null : isPH ? (
           <>
             <p className="muted" style={{ margin: 0 }}>Contact for local pricing</p>
-            <a href="/contact" className="btn-link" style={{ border: "1px solid var(--line)", padding: ".35rem .6rem", borderRadius: ".6rem" }}>
+            <a
+              href="/contact"
+              className="btn-link"
+              onClick={(e) => e.stopPropagation()} // don't flip when tapping link
+              style={{ border: "1px solid var(--line)", padding: ".35rem .6rem", borderRadius: ".6rem" }}
+            >
               Contact Us
             </a>
           </>
@@ -215,6 +196,30 @@ function CardFront({
       </div>
       {children}
     </div>
+  );
+}
+
+/** Flip card with tap/click toggle (mobile) + still works with :hover (desktop) */
+function FlipCard({ front, back }: { front: React.ReactNode; back: React.ReactNode }) {
+  const [flipped, setFlipped] = useState(false);
+
+  return (
+    <article
+      className={`card service-card flip-card ${flipped ? "is-flipped" : ""}`}
+      onClick={() => setFlipped((f) => !f)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped((f) => !f);
+        }
+      }}
+      tabIndex={0}
+    >
+      <div className="flip-card-inner">
+        <div className="flip-card-front">{front}</div>
+        <div className="flip-card-back">{back}</div>
+      </div>
+    </article>
   );
 }
 
@@ -251,26 +256,28 @@ export default function ServicesAndPricing() {
         {/* GRID of flip-cards; structure matches your globals.css */}
         <div className="grid stagger reveal" data-anim="up">
           {/* Deep Cleaning */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
-              <CardFront title="Deep Cleaning" priceUSD={35} isPH={isPH}>
-                <ul className="pick-list">
-                  <li>A complete hardware refresh for your guitar.</li>
-                  <li>Disassembly, cleaning, and reassembly of bridges (Floyd Rose, Strat, 2-point tremolo)</li>
-                  <li>Full hardware deep clean (including tuning pegs)</li>
-                  <li>Fretboard reconditioning</li>
-                  <li>All cleaning done with MusicNomad professional tools and solutions</li>
-                  <li>Scratchy potentiometer, cleaning included.</li>
-                  <li>Available when you avail one of our setup packages.</li>
-                </ul>
-              </CardFront>
-              <CardBackMedia serviceKey="deep-cleaning" alt="Deep Cleaning examples" />
-            </div>
-          </article>
+          <FlipCard
+            front={
+              <>
+                <CardFront title="Deep Cleaning" priceUSD={35} isPH={isPH}>
+                  <ul className="pick-list">
+                    <li>A complete hardware refresh for your guitar.</li>
+                    <li>Disassembly, cleaning, and reassembly of bridges (Floyd Rose, Strat, 2-point tremolo)</li>
+                    <li>Full hardware deep clean (including tuning pegs)</li>
+                    <li>Fretboard reconditioning</li>
+                    <li>All cleaning done with MusicNomad professional tools and solutions</li>
+                    <li>Scratchy potentiometer, cleaning included.</li>
+                    <li>Available when you avail one of our setup packages.</li>
+                  </ul>
+                </CardFront>
+              </>
+            }
+            back={<CardBackMedia serviceKey="deep-cleaning" alt="Deep Cleaning examples" />}
+          />
 
           {/* Basic Setup */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Basic Setup" priceUSD={150} isPH={isPH}>
                 <ul className="pick-list">
                   <li>Designed to improve your guitar’s comfort and playability.</li>
@@ -285,14 +292,18 @@ export default function ServicesAndPricing() {
                   <li>Nut lubrication with MusicNomad Nut Sauce for tuning stability and smoother bends</li>
                 </ul>
               </CardFront>
-              <CardBackMedia serviceKey="basic-setup" alt="Basic Setup examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="basic-setup" alt="Basic Setup examples" />}
+          />
 
           {/* Fret Level */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
-              <CardFront title={<><span>Fret Level</span> <small>(Setup Included)</small></>} priceUSD={250} isPH={isPH}>
+          <FlipCard
+            front={
+              <CardFront
+                title={<><span>Fret Level</span> <small>(Setup Included)</small></>}
+                priceUSD={250}
+                isPH={isPH}
+              >
                 <ul className="pick-list">
                   <li>Precision fretwork using specialized tools + experience. Higher chance of lower action vs. basic setup.</li>
                   <li>Fret leveling and crowning with job-specific tools</li>
@@ -301,13 +312,13 @@ export default function ServicesAndPricing() {
                   <li>Optional: fret pressing (hammer method), fret sprout treatment, fret end gluing (depends on instrument condition)</li>
                 </ul>
               </CardFront>
-              <CardBackMedia serviceKey="fret-level" alt="Fret Level examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="fret-level" alt="Fret Level examples" />}
+          />
 
           {/* Wiring & Electronics (variable pricing) */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Wiring & Electronics" isPH={isPH}>
                 {isPH ? null : (
                   <ul className="pick-list">
@@ -320,13 +331,13 @@ export default function ServicesAndPricing() {
                   </ul>
                 )}
               </CardFront>
-              <CardBackMedia serviceKey="wiring" alt="Wiring & Electronics examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="wiring" alt="Wiring & Electronics examples" />}
+          />
 
           {/* Custom Nut Fabrication */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Custom Nut Fabrication" isPH={isPH}>
                 <div style={{ marginBottom: ".5rem" }}>
                   {isPH ? null : <strong>$60–$100 USD</strong>}
@@ -337,13 +348,13 @@ export default function ServicesAndPricing() {
                   <li>Height tailored to your playing style and preference (or our custom height measurement)</li>
                 </ul>
               </CardFront>
-              <CardBackMedia serviceKey="custom-nut" alt="Custom nut examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="custom-nut" alt="Custom nut examples" />}
+          />
 
           {/* Refret */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Refret (Rosewood/Dark Fretboards)" priceUSD={550} isPH={isPH}>
                 <ul className="pick-list">
                   <li>Fret press method using an arbor press</li>
@@ -353,13 +364,13 @@ export default function ServicesAndPricing() {
                   <li>Fretboard leveling included if needed</li>
                 </ul>
               </CardFront>
-              <CardBackMedia serviceKey="refret" alt="Refret examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="refret" alt="Refret examples" />}
+          />
 
           {/* Acoustic Preamp Installation */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Acoustic Preamp Installation" isPH={isPH}>
                 {isPH ? null : (
                   <ul className="pick-list">
@@ -369,13 +380,13 @@ export default function ServicesAndPricing() {
                   </ul>
                 )}
               </CardFront>
-              <CardBackMedia serviceKey="preamp" alt="Acoustic preamp examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="preamp" alt="Acoustic preamp examples" />}
+          />
 
           {/* Crack Repair */}
-          <article className="card service-card flip-card">
-            <div className="flip-card-inner">
+          <FlipCard
+            front={
               <CardFront title="Crack Repair Service" isPH={isPH}>
                 {isPH ? null : (
                   <ul className="pick-list">
@@ -385,9 +396,9 @@ export default function ServicesAndPricing() {
                   </ul>
                 )}
               </CardFront>
-              <CardBackMedia serviceKey="crack-repair" alt="Crack repair examples" />
-            </div>
-          </article>
+            }
+            back={<CardBackMedia serviceKey="crack-repair" alt="Crack repair examples" />}
+          />
         </div>
       </div>
     </section>
