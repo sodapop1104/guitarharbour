@@ -881,10 +881,6 @@ html[data-theme="light"] .bp-title {
   #services .flip-card-inner { min-height: 480px; }
 }
 
-.flip-card.is-flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
 /* Faces already absolute in your CSS; ensure they fill the box */
 #services .flip-card-front,
 #services .flip-card-back {
@@ -893,65 +889,6 @@ html[data-theme="light"] .bp-title {
 }
 
 /* Make sure images on the back aren’t forced grayscale by global rule */
-#services .flip-card-back img {
-  filter: none !important;
-  -webkit-filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-/* ==== Mobile/iOS flip-card fix (services) ==== */
-#services .flip-card {
-  position: relative;
-  -webkit-perspective: 1000px; /* iOS needs prefixed perspective */
-  perspective: 1000px;
-}
-
-#services .flip-card-inner {
-  position: relative;
-  width: 100%;
-  min-height: 520px;           /* ensure faces have height on mobile */
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-  -webkit-transition: -webkit-transform .6s;
-  transition: transform .6s;
-}
-
-@media (max-width: 640px){
-  #services .flip-card-inner { min-height: 480px; }
-}
-
-/* front/back faces: iOS needs backface + translateZ(0) */
-#services .flip-card-front,
-#services .flip-card-back {
-  position: absolute;
-  inset: 0;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);           /* kick in GPU layer on iOS */
-}
-
-#services .flip-card-front {
-  background: var(--surface);
-  padding: 1rem;
-  display: grid;
-  gap: .5rem;
-}
-
-#services .flip-card-back {
-  -webkit-transform: rotateY(180deg);
-  transform: rotateY(180deg);
-  background: #000;
-}
-
-/* keep your existing hover flip, add class toggle for tap */
-#services .flip-card:hover .flip-card-inner,
-#services .flip-card:focus-within .flip-card-inner,
-#services .flip-card.is-flipped .flip-card-inner {
-  -webkit-transform: rotateY(180deg);
-  transform: rotateY(180deg);
-}
-
-/* service photos on the back should be full-color on mobile too */
 #services .flip-card-back img {
   filter: none !important;
   -webkit-filter: none !important;
