@@ -34,11 +34,7 @@ function PriceLine(props: {
     <li className="price-line">
       <span className="price-line__label">{label}</span>
       <span className="price-line__spacer" />
-      <GeoPrice
-        usd={usd}
-        // @ts-ignore — allow usdRange as prop
-        usdRange={usdRange}
-      />
+      <GeoPrice usd={usd} usdRange={usdRange} />
       {note ? <span className="price-line__note">{note}</span> : null}
     </li>
   );
@@ -159,7 +155,6 @@ export default function ServicesAndPricing() {
           <article className="card service-card">
             <h3 style={{ marginBottom: 6 }}>Custom Nut Fabrication</h3>
             <div className="price-row">
-              {/* @ts-ignore */}
               <GeoPrice usdRange={[60, 100]} />
             </div>
             <ul className="pick-list">

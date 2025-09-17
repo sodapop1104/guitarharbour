@@ -11,9 +11,8 @@ type Props = {
   /** Optional suffix like "USD" (defaults to "USD") */
   suffix?: string;
 
-  /** For PH side: just show contact note */
+  /** PH side (or no price): show this note */
   contactText?: string;
-  contactHref?: string;
 
   className?: string;
 };
@@ -40,7 +39,6 @@ export default function GeoPrice({
   usdRange,
   suffix = "USD",
   contactText = "Contact us for pricing",
-  contactHref = "/contact",
   className,
 }: Props) {
   const country = useCountryCode();
@@ -54,6 +52,7 @@ export default function GeoPrice({
     typeof usdRange[0] === "number" &&
     typeof usdRange[1] === "number";
 
+  // PH path: single muted line under title
   if (isPH) {
     return (
       <div
@@ -65,6 +64,7 @@ export default function GeoPrice({
     );
   }
 
+  // US/others with prices
   if (hasSingle) {
     return (
       <div
@@ -89,6 +89,7 @@ export default function GeoPrice({
     );
   }
 
+  // Fallback if no price passed (non-PH)
   return (
     <div
       className={className}
