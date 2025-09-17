@@ -4,9 +4,17 @@
 import React, { useEffect, useState } from "react";
 
 type Props = {
+  /** Single USD price (e.g., 150) */
   usd?: number;
+  /** USD range (e.g., [100, 150]) */
   usdRange?: [number, number];
+  /** Optional suffix like "USD" (defaults to "USD") */
   suffix?: string;
+
+  /** For PH side: just show contact note */
+  contactText?: string;
+  contactHref?: string;
+
   className?: string;
 };
 
@@ -31,6 +39,8 @@ export default function GeoPrice({
   usd,
   usdRange,
   suffix = "USD",
+  contactText = "Contact us for pricing",
+  contactHref = "/contact",
   className,
 }: Props) {
   const country = useCountryCode();
@@ -50,7 +60,7 @@ export default function GeoPrice({
         className={className}
         style={{ color: "var(--muted)", fontSize: "0.95rem", marginBottom: "0.5rem" }}
       >
-        Contact us for pricing
+        {contactText}
       </div>
     );
   }
@@ -79,5 +89,12 @@ export default function GeoPrice({
     );
   }
 
-  return null;
+  return (
+    <div
+      className={className}
+      style={{ color: "var(--muted)", fontSize: "0.95rem", marginBottom: "0.5rem" }}
+    >
+      {contactText}
+    </div>
+  );
 }
