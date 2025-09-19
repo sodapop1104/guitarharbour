@@ -134,12 +134,12 @@ export default function Contact() {
           <div className="reveal" data-anim="right" aria-label="Shop details">
             <p><strong>Location</strong></p>
             <p>
-              <strong>Temple City, CA</strong><br />
+              <strong>Los Angeles, CA</strong><br />
               We serve musicians across the San Gabriel Valley and nearby areas. Our pickup-and-delivery service handles expert guitar repairs, setups, and modifications — we collect your instrument, care for it, and return it ready to play.
             </p>
             <p>
               <strong>Manila, Philippines</strong><br />
-              1929 Tomas Mapua St., Sta. Cruz, Manila 1012<br />
+              1929 Tomas Mapua St., Sta. Cruz<br />
               Manila, Philippines
             </p>
 
@@ -149,7 +149,7 @@ export default function Contact() {
             {/* Social Buttons */}
             <p><strong>Social</strong></p>
             <div className="social-buttons">
-              <a href="https://www.facebook.com/GuitarHarbourPH" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn facebook"><FaFacebook /> Facebook</a>
+              <a href="https://www.facebook.com/guitarharbourlosangeles" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn facebook"><FaFacebook /> Facebook</a>
               <a href="https://www.instagram.com/guitarharbour.la/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-btn instagram"><FaInstagram /> Instagram</a>
               <a href="https://www.youtube.com/@bimbocanayon2308" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="social-btn youtube"><FaYoutube /> YouTube</a>
               <a href="https://www.tiktok.com/@guitarharbourla" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="social-btn tiktok"><FaTiktok /> TikTok</a>
