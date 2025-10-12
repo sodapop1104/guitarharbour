@@ -24,9 +24,18 @@ export default function Page() {
 
         <Contact />
 
-        {/* Gallery pinned to bottom of the page sections */}
+        {/* Galleries pinned to bottom of the page sections */}
         <section id="gallery" className="container">
-          <Gallery />
+          {/* Finished Products */}
+          <h2 className="sr-only">Finished Products</h2>
+          <Gallery endpoint="/api/gallery/finished" hashKey="gallery" />
+
+          {/* Spacing between the two galleries */}
+          <div style={{ marginTop: "3rem" }} />
+
+          {/* Setups & Repairs */}
+          <h2 className="sr-only">Setups & Repairs</h2>
+          <Gallery endpoint="/api/gallery/repairs" hashKey="repairs" />
         </section>
       </main>
       <Footer />

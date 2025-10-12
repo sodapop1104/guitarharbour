@@ -2,7 +2,7 @@ export const dynamic = "force-static";
 
 export default function AccessibilityPage() {
   return (
-    <main className="bp-wrap" style={{ maxWidth: 900 }}>
+    <main className="legal bp-wrap" style={{ maxWidth: 900 }}>
       <h1 className="bp-title">Accessibility Statement</h1>
 
       <p>
@@ -14,9 +14,13 @@ export default function AccessibilityPage() {
       <ul>
         <li>Regularly reviewing website content for accessibility compliance.</li>
         <li>Providing text alternatives for non-text content where possible.</li>
-        <li>Ensuring keyboard navigation works throughout the website.</li>
-        <li>Using clear, readable fonts and high-contrast colors.</li>
+        <li>Ensuring sufficient color contrast and keyboard accessibility.</li>
       </ul>
+
+      <h2 className="bp-sectionTitle">Standards</h2>
+      <p>
+        We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.2 Level AA where feasible.
+      </p>
 
       <h2 className="bp-sectionTitle">Feedback</h2>
       <p>

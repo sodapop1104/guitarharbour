@@ -4,7 +4,7 @@ export default function PrivacyPage() {
   const updated = "August 18, 2025"; // Hardcode instead of auto date
 
   return (
-    <main className="bp-wrap" style={{ maxWidth: 900 }}>
+    <main className="legal bp-wrap" style={{ maxWidth: 900 }}>
       <h1 className="bp-title">Privacy Policy</h1>
       <p className="bp-subtitle" style={{ marginBottom: 16 }}>
         Last updated: {updated}

@@ -29,11 +29,11 @@
     "@types/nodemailer": "^7.0.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "^15.5.0",
     "tailwindcss": "^4",
-    "typescript": "^5.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
-
-
