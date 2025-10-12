@@ -1,70 +1,45 @@
 // app/api/gallery/[kind]/route.ts
-import { NextResponse } from "next/server";
-import { listDriveImages, whoAmI } from "@/app/lib/drive";
+import { NextRequest } from "next/server";
 
-export const runtime = "nodejs";
-export const revalidate = 600;
-
-type Kind = "finished" | "repairs";
+// If you want to validate allowed values, list them here:
+const ALLOWED_KINDS = new Set(["drive", "local"]); // add more if needed
 
 export async function GET(
-  _req: Request,
-  { params }: { params: { kind: Kind } }
+  _req: NextRequest,
+  ctx: { params: { kind: string } } // <- important: string, not a custom type
 ) {
-  const { kind } = params;
+  const { kind } = ctx.params;
 
-  const folderId =
-    kind === "finished"
-      ? process.env.DRIVE_GALLERY_FINISHED_ID
-      : process.env.DRIVE_GALLERY_REPAIRS_ID;
+  // Optional: guard/normalize
+  const k = String(kind).toLowerCase();
 
-  if (!folderId) {
-    return NextResponse.json(
-      { images: [], error: `Missing env for ${kind} folder` },
-      { status: 500 }
+  if (!ALLOWED_KINDS.has(k)) {
+    return Response.json(
+      { error: `Invalid kind "${kind}". Allowed: ${Array.from(ALLOWED_KINDS).join(", ")}` },
+      { status: 400 }
     );
   }
 
   try {
-    // Expect each item from listDriveImages to include at least { id, name }
-    const items = await listDriveImages(folderId);
+    if (k === "drive") {
+      // TODO: replace with your real Drive-backed implementation
+      // Example shape:
+      // const images = await listDriveImages(process.env.DRIVE_FOLDER_ID!);
+      // return Response.json({ kind: k, images });
+      return Response.json({ kind: k, images: [] });
+    }
 
-    const images = (items || [])
-      .map((i: any) => {
-        const id: string | undefined = i.id || i.fileId || undefined;
-        const name: string | undefined =
-          i.name || i.filename || i.title || undefined;
+    if (k === "local") {
+      // TODO: replace with your local fallback implementation
+      // const images = await listLocalImages();
+      // return Response.json({ kind: k, images });
+      return Response.json({ kind: k, images: [] });
+    }
 
-        // Prefer a stable, direct "view" URL for images:
-        // Works for publicly shared Drive images.
-        const url: string | undefined = id
-          ? `https://drive.google.com/uc?export=view&id=${id}`
-          : i.url || i.webContentLink || i.webViewLink || undefined;
-
-        if (!url) return null;
-
-        return { id, name, url };
-      })
-      .filter(Boolean);
-
-    return NextResponse.json({ images });
-  } catch (err: any) {
-    let authenticatedAs: string | null = null;
-    try {
-      const me = await whoAmI();
-      authenticatedAs = me?.email ?? null;
-    } catch {}
-    return NextResponse.json(
-      {
-        images: [],
-        error: "Drive list failed",
-        diag: {
-          message: String(err?.message || err),
-          authenticatedAs,
-          folderId,
-        },
-      },
-      { status: 200 }
-    );
+    // Fallback (should not hit if guarded above)
+    return Response.json({ kind: k, images: [] });
+  } catch (err) {
+    console.error("[gallery route] error", err);
+    return Response.json({ error: "Failed to load gallery" }, { status: 500 });
   }
 }
