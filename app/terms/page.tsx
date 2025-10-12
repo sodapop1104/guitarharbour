@@ -4,7 +4,7 @@ export default function TermsPage() {
   const updated = "August 18, 2025"; // Hardcoded date
 
   return (
-    <main className="bp-wrap">
+    <main className="legal bp-wrap">
       <h1 className="bp-title">Terms of Service</h1>
       <p className="bp-subtitle">Last updated: {updated}</p>
 
@@ -14,49 +14,57 @@ export default function TermsPage() {
         read them carefully.
       </p>
 
-      <h2 className="bp-sectionTitle">Services</h2>
-      <p>
-        We provide guitar repair, setup, and related services. Specific details,
-        pricing, and availability may vary and will be confirmed when you book a
-        service.
-      </p>
-
-      <h2 className="bp-sectionTitle">User Responsibilities</h2>
+      <h2 className="bp-sectionTitle">Use of the Site</h2>
       <ul>
-        <li>Provide accurate contact and booking information.</li>
-        <li>Pick up and drop off instruments on the agreed schedule (if applicable).</li>
-        <li>Ensure that any instrument you provide is your property or that you have the right to authorize repairs.</li>
+        <li>Don’t misuse the site or attempt to interfere with its operation.</li>
+        <li>
+          You may not use our name, brand, or content without permission except
+          as allowed by law.
+        </li>
+      </ul>
+
+      <h2 className="bp-sectionTitle">Bookings & Services</h2>
+      <ul>
+        <li>Quoted prices are estimates; final costs may vary based on scope.</li>
+        <li>We reserve the right to refuse service for any reason.</li>
+        <li>
+          You are responsible for accurate information when booking and for
+          picking up/dropping off instruments on time.
+        </li>
       </ul>
 
       <h2 className="bp-sectionTitle">Payment</h2>
-      <p>
-        Payment terms will be communicated at the time of booking. Unless
-        otherwise agreed, payment is due upon completion of the service.
-        We reserve the right to withhold release of instruments until payment is received in full.
-      </p>
-
-      <h2 className="bp-sectionTitle">Cancellations</h2>
-      <p>
-        If you need to cancel or reschedule, please contact us at{" "}
-        <a href="mailto:contact@guitarharbour.com">contact@guitarharbour.com</a>.
-      </p>
-
-      <h2 className="bp-sectionTitle">Limitations of Liability</h2>
-      <p>While we take care with every instrument, <b>Guitar Harbour</b> is not liable for:</p>
       <ul>
-        <li>Pre-existing damage or defects in your instrument.</li>
-        <li>Normal wear and tear or issues arising from improper storage or use after service.</li>
-        <li>Indirect, incidental, or consequential damages.</li>
+        <li>Payment is due upon completion unless otherwise agreed.</li>
+        <li>
+          Deposits (if any) may be required for certain services or parts orders.
+        </li>
       </ul>
 
-      <h2 className="bp-sectionTitle">Intellectual Property</h2>
-      <p>All content on this website (including text, images, and branding) is the property of <b>Guitar Harbour</b> and may not be used without permission.</p>
+      <h2 className="bp-sectionTitle">Warranty & Limitations</h2>
+      <ul>
+        <li>
+          We stand behind our work. If you experience an issue related to our
+          service within a reasonable timeframe, contact us and we’ll assess it.
+        </li>
+        <li>
+          To the maximum extent permitted by law, we are not liable for indirect
+          or consequential damages.
+        </li>
+      </ul>
+
+      <h2 className="bp-sectionTitle">User Content</h2>
+      <p>
+        If you submit reviews, messages, or media, you grant us a non-exclusive
+        license to display them on the site and our social pages, subject to our
+        moderation.
+      </p>
 
       <h2 className="bp-sectionTitle">Privacy</h2>
       <p>Your use of this site is also governed by our <a href="/privacy">Privacy Policy</a>.</p>
 
       <h2 className="bp-sectionTitle">Changes</h2>
-      <p>We may update these Terms from time to time. Continued use of our website or services after changes means you accept the updated Terms.</p>
+      <p>We may update these Terms from time to time. Continued use of the site or our services after changes means you accept the updated Terms.</p>
 
       <h2 className="bp-sectionTitle">Contact</h2>
       <p>

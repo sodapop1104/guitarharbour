@@ -3,60 +3,120 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type Img = { src: string; alt: string };
+type Img = { src: string; full: string; alt: string };
+type ApiImage =
+  | string
+  | {
+      id?: string;         // Drive file ID
+      url?: string;        // Direct/public URL if you already have it
+      name?: string;       // Human file name from Drive
+      mimeType?: string;   // Optional
+    };
+
 const MAX_VISIBLE = 12;
 
-// Parse hash formats:
-//  - #gallery=10            (index)
-//  - #gallery=filename.jpg  (by filename)
-//  - #gallery=filename      (without extension)
-function parseGalleryHash(hash: string) {
-  const m = hash.match(/#gallery=(.+)$/i);
+/* ---------------- Helpers for Drive ---------------- */
+
+const DRIVE_ID_RE = /^[A-Za-z0-9_-]{20,}$/;
+
+function isDriveId(s: string) {
+  return DRIVE_ID_RE.test(s) && !s.includes("/") && !s.includes(".");
+}
+
+function driveThumbURL(id: string, width = 1200) {
+  return `https://lh3.googleusercontent.com/d/${id}=w${width}`;
+}
+function driveFullURL(id: string) {
+  return `https://drive.google.com/uc?export=view&id=${id}`;
+}
+
+function lastSegment(path: string) {
+  return (path.split("/").pop() || path).trim();
+}
+
+function driveIdFromUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    const id = u.searchParams.get("id");
+    if (id && isDriveId(id)) return id;
+    const m = u.pathname.match(/\/d\/([A-Za-z0-9_-]{20,})/);
+    if (m?.[1] && isDriveId(m[1])) return m[1];
+  } catch {}
+  return null;
+}
+
+function stripExt(name: string) {
+  return name.replace(/\.[^.]+$/, "");
+}
+
+function normalizeToImg(item: ApiImage): Img {
+  if (typeof item === "string") {
+    if (isDriveId(item)) {
+      return { src: driveThumbURL(item, 1200), full: driveFullURL(item), alt: "Photo" };
+    }
+    const id = driveIdFromUrl(item);
+    if (id) {
+      return { src: driveThumbURL(id, 1200), full: driveFullURL(id), alt: "Photo" };
+    }
+    return { src: item, full: item, alt: stripExt(lastSegment(item)).replace(/[-_]+/g, " ") };
+  }
+
+  const { id, url, name } = item;
+  if (id && isDriveId(id)) {
+    return { src: driveThumbURL(id, 1200), full: driveFullURL(id), alt: (name && stripExt(name)) || "Photo" };
+  }
+  if (url) {
+    const gotId = driveIdFromUrl(url);
+    if (gotId) {
+      return { src: driveThumbURL(gotId, 1200), full: driveFullURL(gotId), alt: (name && stripExt(name)) || "Photo" };
+    }
+    return { src: url, full: url, alt: (name && stripExt(name)) || stripExt(lastSegment(url)).replace(/[-_]+/g, " ") };
+  }
+  return { src: "", full: "", alt: (name && stripExt(name)) || "Photo" };
+}
+
+function parseGalleryHash(hash: string, hashKey: string) {
+  const m = hash.match(new RegExp(`#${hashKey}=(.+)$`, "i"));
   if (!m) return null;
   const value = decodeURIComponent(m[1]);
-  // index?
   const asNum = Number(value);
   if (!Number.isNaN(asNum)) return { type: "index" as const, value: asNum };
-  // filename?
   return { type: "name" as const, value };
 }
 
-function filenameFromSrc(src: string) {
-  const base = src.split("/").pop() || "";
-  return base;
-}
+const nameKey = (img: Img) =>
+  stripExt(lastSegment(img.full || img.src)).toLowerCase();
 
-function nameWithoutExt(srcOrName: string) {
-  return (srcOrName.split("/").pop() || "").replace(/\.[^.]+$/, "");
-}
+type GalleryProps = {
+  endpoint?: string;
+  hashKey?: string;
+  title?: string;
+};
 
-export default function Gallery() {
+export default function Gallery({
+  endpoint = "/api/gallery",
+  hashKey = "gallery",
+  title = "", // hide "GALLERY"
+}: GalleryProps) {
   const [all, setAll] = useState<Img[]>([]);
   const [showAll, setShowAll] = useState(false);
-
-  // Lightbox state
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
 
-  // For swipe gestures
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const touchStartT = useRef<number | null>(null);
+  const visible = useMemo(
+    () => (showAll ? all : all.slice(0, MAX_VISIBLE)),
+    [all, showAll]
+  );
 
-  // Load images from API
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/gallery", { cache: "no-store" });
-        const data = (await res.json()) as { images: string[] };
-        if (!cancelled) {
-          const imgs = (data.images ?? []).map((src) => ({
-            src,
-            alt: nameWithoutExt(src) || "image",
-          }));
-          setAll(imgs);
-        }
+        const res = await fetch(endpoint, { cache: "no-store" });
+        const json = await res.json();
+        const images = (json.images ?? []) as ApiImage[];
+        const normalized = images.map(normalizeToImg).filter((x) => x.src);
+        if (!cancelled) setAll(normalized);
       } catch {
         if (!cancelled) setAll([]);
       }
@@ -64,69 +124,46 @@ export default function Gallery() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [endpoint]);
 
-  // Visible subset
-  const visible = useMemo(() => (showAll ? all : all.slice(0, MAX_VISIBLE)), [all, showAll]);
-
-  const close = useCallback(() => {
-    setOpen(false);
-    // Clear hash on close
-    if (typeof window !== "undefined") {
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-    }
-  }, []);
-
-  const pushHashForIndex = useCallback(
-    (i: number) => {
-      if (typeof window === "undefined") return;
-      const name = filenameFromSrc(all[i].src);
-      const newHash = `#gallery=${encodeURIComponent(name)}`;
-      if (window.location.hash !== newHash) {
-        history.replaceState(null, "", window.location.pathname + window.location.search + newHash);
+  useEffect(() => {
+    if (!all.length) return;
+    const openFromHash = () => {
+      const p = parseGalleryHash(window.location.hash, hashKey);
+      if (!p) return;
+      if (p.type === "index") {
+        const n = Math.max(0, Math.min(all.length - 1, p.value));
+        openAt(n);
+        return;
       }
-    },
-    [all]
-  );
+      const byName = all.findIndex((img) => nameKey(img) === p.value.toLowerCase());
+      if (byName >= 0) openAt(byName);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [all, hashKey]);
 
-  const openAt = useCallback(
-    (i: number) => {
-      setIdx(i);
-      setOpen(true);
-      pushHashForIndex(i);
-    },
-    [pushHashForIndex]
-  );
+  const openAt = (i: number) => {
+    setIdx(i);
+    setOpen(true);
+  };
 
-  const next = useCallback(() => {
-    setIdx((i) => {
-      const ni = all.length ? (i + 1) % all.length : i;
-      if (all.length) pushHashForIndex(ni);
-      return ni;
-    });
-  }, [all.length, pushHashForIndex]);
+  const close = useCallback(() => setOpen(false), []);
+  const next = useCallback(() => setIdx((i) => (i + 1) % all.length), [all.length]);
+  const prev = useCallback(() => setIdx((i) => (i - 1 + all.length) % all.length), [all.length]);
 
-  const prev = useCallback(() => {
-    setIdx((i) => {
-      const ni = all.length ? (i - 1 + all.length) % all.length : i;
-      if (all.length) pushHashForIndex(ni);
-      return ni;
-    });
-  }, [all.length, pushHashForIndex]);
-
-  // Keyboard nav when lightbox is open
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close, next, prev]);
 
-  // Lock body scroll when lightbox is open
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.documentElement.style.overflow;
@@ -136,147 +173,102 @@ export default function Gallery() {
     };
   }, [open]);
 
-  // Open lightbox from hash on first load / when images arrive
+  const gridRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (!all.length) return;
-    const openFromHash = () => {
-      const p = parseGalleryHash(window.location.hash);
-      if (!p) return;
+    const el = gridRef.current;
+    if (!el) return;
+    const tiles = Array.from(el.querySelectorAll<HTMLElement>(".gh-tile.reveal"));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            (en.target as HTMLElement).classList.add("in");
+            io.unobserve(en.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.15 }
+    );
+    tiles.forEach((tile) => io.observe(tile));
+    return () => io.disconnect();
+  }, [visible.length]);
 
-      let targetIndex = 0;
-      if (p.type === "index") {
-        // clamp to bounds
-        targetIndex = Math.max(0, Math.min(all.length - 1, Number(p.value)));
-      } else {
-        // by name
-        const value = String(p.value).toLowerCase();
-        // support both filename with extension and without
-        const byFull = all.findIndex((img) => filenameFromSrc(img.src).toLowerCase() === value);
-        const byBase =
-          byFull === -1 ? all.findIndex((img) => nameWithoutExt(img.src).toLowerCase() === value) : byFull;
-        targetIndex = byBase !== -1 ? byBase : 0;
-      }
-      setShowAll(true); // reveal full gallery if coming from deep link
-      openAt(targetIndex);
-    };
-
-    // on initial images load
-    openFromHash();
-
-    // also react to future hash changes while on the page
-    const onHash = () => {
-      if (!window.location.hash.startsWith("#gallery=")) return;
-      openFromHash();
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, [all, openAt]);
-
-  // Swipe gestures (inside lightbox)
-  const onTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0];
-    touchStartX.current = t.clientX;
-    touchStartY.current = t.clientY;
-    touchStartT.current = Date.now();
-  };
-
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current == null || touchStartY.current == null || touchStartT.current == null)
-      return;
-
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX.current;
-    const dy = t.clientY - touchStartY.current;
-    const dt = Date.now() - touchStartT.current;
-
-    // Basic swipe heuristic
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
-    const isHorizontal = absX > 50 && absX > absY * 1.5 && dt < 600;
-
-    if (isHorizontal) {
-      if (dx < 0) next();
-      else prev();
+  const onThumbClick = (i: number) => {
+    if (!all[i]) return;
+    const key = nameKey(all[i]) || String(i);
+    const newHash = `#${hashKey}=${encodeURIComponent(key)}`;
+    if (window.location.hash !== newHash) {
+      history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search + newHash
+      );
     }
-
-    touchStartX.current = null;
-    touchStartY.current = null;
-    touchStartT.current = null;
+    openAt(i);
   };
 
   return (
-    <section className="gh-gallery">
-      <h2 className="gh-gallery-title">Gallery</h2>
+    <section className="gh-gallery" id={hashKey}>
+      {/* No heading */}
+      {title ? <h2 className="gh-gallery-title">{title}</h2> : null}
 
-      <div className="gh-gallery-grid">
+      <div ref={gridRef} className="gh-gallery-grid">
         {visible.map((img, i) => (
           <button
-            key={img.src}
-            className="gh-thumb"
-            onClick={() => openAt(i)} // index aligns since visible is slice from 0
-            aria-label={`Open image ${img.alt}`}
+            key={(img.src || img.full) + i}
+            className="gh-thumb gh-tile reveal"
+            onClick={() => onThumbClick(i)}
+            aria-label={`Open image ${img.alt || `#${i + 1}`}`}
           >
-            <div className="gh-thumb-wrap">
+            <span className="gh-thumb-wrap">
               <Image
                 src={img.src}
-                alt={img.alt}
+                alt={img.alt || ""}
                 fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className="gh-thumb-img"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                priority={i < 3}
               />
-            </div>
+            </span>
+            {/* caption removed */}
           </button>
         ))}
       </div>
 
-      {/* View full gallery / Show less */}
-      {all.length > MAX_VISIBLE && !showAll && (
-        <div className="gh-gallery-actions">
-          <button className="gh-btn" onClick={() => setShowAll(true)}>
-            View full gallery ({all.length})
-          </button>
-        </div>
-      )}
-      {showAll && all.length > MAX_VISIBLE && (
-        <div className="gh-gallery-actions">
-          <button className="gh-btn gh-btn-secondary" onClick={() => setShowAll(false)}>
-            Show less
+      {!showAll && all.length > MAX_VISIBLE && (
+        <div className="gh-gallery-controls">
+          <button className="btn" onClick={() => setShowAll(true)}>
+            Load More
           </button>
         </div>
       )}
 
-      {/* Lightbox */}
-      {open && all.length > 0 && (
-        <div className="gh-lightbox" role="dialog" aria-modal="true" onClick={close}>
-          <div className="gh-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+      {open && all[idx] && (
+        <div className="gh-lightbox" role="dialog" aria-modal="true">
+          <div className="gh-lightbox-inner">
             <button className="gh-lightbox-close" onClick={close} aria-label="Close">
-              ✕
+              ×
+            </button>
+            <button className="gh-lightbox-prev" onClick={prev} aria-label="Previous">
+              ‹
             </button>
 
-            <div
-              className="gh-lightbox-img-wrap"
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-            >
+            <div className="gh-lightbox-img-wrap">
               <Image
-                src={all[idx].src}
-                alt={all[idx].alt}
+                src={all[idx].full || all[idx].src}
+                alt={all[idx].alt || ""}
                 fill
-                priority
-                sizes="92vw"
+                sizes="100vw"
                 className="gh-lightbox-img"
+                priority
               />
-              <button className="gh-lightbox-prev" onClick={prev} aria-label="Previous">
-                ‹
-              </button>
-              <button className="gh-lightbox-next" onClick={next} aria-label="Next">
-                ›
-              </button>
             </div>
 
-            <div className="gh-lightbox-caption">{all[idx].alt}</div>
+            <button className="gh-lightbox-next" onClick={next} aria-label="Next">
+              ›
+            </button>
           </div>
+
+          <div className="gh-lightbox-caption">{all[idx].alt}</div>
         </div>
       )}
     </section>

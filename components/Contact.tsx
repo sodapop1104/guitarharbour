@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { FaFacebook, FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 
 type SubmitState = "idle" | "sending" | "success" | "error";
+type Region = "PH" | "INTL";
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -11,7 +12,31 @@ export default function Contact() {
   const [status, setStatus] = useState<SubmitState>("idle");
   const [serverMsg, setServerMsg] = useState<string>("");
 
-  const emailRegex = /^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\-\.]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/;
+  // ---- Region detection via cookie set by middleware.ts ----
+  const [region, setRegion] = useState<Region>("INTL");
+  useEffect(() => {
+    const cookie = document.cookie.split("; ").find(row => row.startsWith("country_code="));
+    const code = cookie?.split("=")[1];
+    if (code?.toUpperCase() === "PH") setRegion("PH");
+  }, []);
+
+  const socials =
+    region === "PH"
+      ? {
+          facebook: "https://www.facebook.com/guitarharbourphilippines",
+          instagram: "https://www.instagram.com/guitarharbourphilippines/",
+          tiktok: "https://www.tiktok.com/@guitarharbourphilippines",
+          youtube: "https://www.youtube.com/@bimbocanayon2308",
+        }
+      : {
+          facebook: "https://www.facebook.com/guitarharbourlosangeles",
+          instagram: "https://www.instagram.com/guitarharbourlosangeles/",
+          tiktok: "https://www.tiktok.com/@guitarharbourlosangeles",
+          youtube: "https://www.youtube.com/@bimbocanayon2308",
+        };
+
+  const emailRegex =
+    /^(?!\.)(?!.*\.\.)[A-Za-z0-9_'+\-\.]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -21,7 +46,8 @@ export default function Contact() {
       setErrors(prev => ({ ...prev, name: value.trim() ? "" : "Please enter your name." }));
     } else if (name === "email") {
       if (!value.trim()) setErrors(prev => ({ ...prev, email: "Please enter your email." }));
-      else if (!emailRegex.test(value)) setErrors(prev => ({ ...prev, email: "Please enter a valid email address." }));
+      else if (!emailRegex.test(value))
+        setErrors(prev => ({ ...prev, email: "Please enter a valid email address." }));
       else setErrors(prev => ({ ...prev, email: "" }));
     } else if (name === "message") {
       setErrors(prev => ({ ...prev, message: value.trim() ? "" : "Please enter a message." }));
@@ -64,7 +90,9 @@ export default function Contact() {
       setFormData({ name: "", email: "", message: "" });
     } catch (err: unknown) {
       setStatus("error");
-      setServerMsg(err instanceof Error ? err.message : "Unable to send right now. Please try again.");
+      setServerMsg(
+        err instanceof Error ? err.message : "Unable to send right now. Please try again."
+      );
     } finally {
       setTimeout(() => setStatus("idle"), 3000);
     }
@@ -146,13 +174,45 @@ export default function Contact() {
             <p><strong>Hours</strong><br />Available by appointment • Mon–Sat, 9AM–6PM</p>
             <p><strong>Email</strong><br /><span>contact@guitarharbour.com</span></p> {/* plain text so it won't open mail app */}
 
-            {/* Social Buttons */}
+            {/* Social Buttons (Region-aware) */}
             <p><strong>Social</strong></p>
             <div className="social-buttons">
-              <a href="https://www.facebook.com/guitarharbourlosangeles" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn facebook"><FaFacebook /> Facebook</a>
-              <a href="https://www.instagram.com/guitarharbour.la/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-btn instagram"><FaInstagram /> Instagram</a>
-              <a href="https://www.youtube.com/@bimbocanayon2308" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="social-btn youtube"><FaYoutube /> YouTube</a>
-              <a href="https://www.tiktok.com/@guitarharbourla" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="social-btn tiktok"><FaTiktok /> TikTok</a>
+              <a
+                href={socials.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="social-btn facebook"
+              >
+                <FaFacebook /> Facebook
+              </a>
+              <a
+                href={socials.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="social-btn instagram"
+              >
+                <FaInstagram /> Instagram
+              </a>
+                            <a
+                href={socials.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="social-btn tiktok"
+              >
+                <FaTiktok /> TikTok
+              </a>
+              <a
+                href={socials.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="social-btn youtube"
+              >
+                <FaYoutube /> YouTube
+              </a>
             </div>
           </div>
         </div>

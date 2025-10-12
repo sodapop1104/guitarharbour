@@ -14,19 +14,23 @@ export default function DoNotSellPage() {
       const res = await fetch('/api/ccpa/optout', { method: 'POST' });
       if (!res.ok) throw new Error('Request failed');
       setStatus('done');
-      setMessage('Preference saved. We will not sell or share your personal information.');
-    } catch {
+      setMessage('Your preference has been saved. We will not sell/share your personal information.');
+    } catch (e) {
       setStatus('error');
       setMessage('Something went wrong. Please try again.');
     }
   }
 
   return (
-    <main className="container" style={{ padding: '40px 0 80px', maxWidth: 720 }}>
-      <h1 style={{ marginBottom: 10 }}>Do Not Sell or Share My Personal Information</h1>
-      <p className="muted" style={{ marginBottom: 20 }}>
-        This page lets California residents (and anyone else) set a preference that we will not sell or share their personal
-        information for cross-context behavioral advertising. You can change this at any time.
+    <main className="legal container" style={{ padding: '40px 0 80px', maxWidth: 720 }}>
+      <h1 style={{ marginBottom: 10 }}>
+        Do Not Sell or Share My Personal Information (CCPA/CPRA)
+      </h1>
+      <p style={{ marginBottom: 14 }}>
+        You can opt out of any “sale” or “sharing” of your personal information
+        as defined by California law. We don’t currently sell or share data for
+        cross-context behavioral advertising, but if that changes, your choice here
+        will be honored. We also respect Global Privacy Control (GPC) signals.
       </p>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
