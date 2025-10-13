@@ -2,31 +2,34 @@
 
 const ALLOWED_KINDS = new Set(["drive", "local"]);
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { kind: string } } // <-- must destructure + exact string type
-) {
-  const k = params.kind.toLowerCase();
+export async function GET(req: Request) {
+  // Extract `[kind]` from the URL path instead of using the 2nd arg
+  const { pathname } = new URL(req.url);
+  // matches /api/gallery/<kind>(/...)?
+  const m = pathname.match(/\/api\/gallery\/([^/]+)/);
+  const kind = (m?.[1] ?? "").toLowerCase();
 
-  if (!ALLOWED_KINDS.has(k)) {
+  if (!ALLOWED_KINDS.has(kind)) {
     return Response.json(
-      { error: `Invalid kind "${params.kind}". Allowed: ${Array.from(ALLOWED_KINDS).join(", ")}` },
+      { error: `Invalid kind "${kind}". Allowed: ${Array.from(ALLOWED_KINDS).join(", ")}` },
       { status: 400 }
     );
   }
 
   try {
-    if (k === "drive") {
-      // TODO: real Drive listing here
-      return Response.json({ kind: k, images: [] });
+    if (kind === "drive") {
+      // TODO: your real Drive-backed listing
+      // const images = await listDriveImages(process.env.DRIVE_FOLDER_ID!);
+      return Response.json({ kind, images: [] });
     }
 
-    if (k === "local") {
-      // TODO: real local listing here
-      return Response.json({ kind: k, images: [] });
+    if (kind === "local") {
+      // TODO: your real local listing
+      return Response.json({ kind, images: [] });
     }
 
-    return Response.json({ kind: k, images: [] });
+    // Shouldn’t hit due to guard
+    return Response.json({ kind, images: [] });
   } catch (err) {
     console.error("[gallery route] error", err);
     return Response.json({ error: "Failed to load gallery" }, { status: 500 });
