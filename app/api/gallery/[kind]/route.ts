@@ -1,47 +1,54 @@
 // app/api/gallery/[kind]/route.ts
-import { listDriveImages } from "@/app/lib/drive";
+import { listDriveImages } from "@/app/lib/drive"; // your existing helper
 
-export const dynamic = "force-dynamic"; // don't cache; we want fresh listings
+export const dynamic = "force-dynamic";
 
-// Declare the "kinds" you support at /api/gallery/[kind]
-type Kind = "finished" | "repairs";
+// Accept multiple aliases from the URL
+type IncomingKind = "setup" | "setups" | "finished" | "repair" | "repairs";
 
-// Map kinds to Google Drive folder IDs (set these in Vercel env)
-const FOLDER_ENV: Record<Kind, string | undefined> = {
+// Canonical buckets we actually store
+type Bucket = "finished" | "repairs";
+
+const ALIAS_TO_BUCKET: Record<IncomingKind, Bucket> = {
+  setup: "finished",
+  setups: "finished",
+  finished: "finished",
+  repair: "repairs",
+  repairs: "repairs",
+};
+
+const FOLDER_ENV: Record<Bucket, string | undefined> = {
   finished: process.env.DRIVE_GALLERY_FINISHED_FOLDER_ID,
   repairs: process.env.DRIVE_GALLERY_REPAIRS_FOLDER_ID,
 };
 
-// Use the typed RouteContext that Next generates in `.next/types/routes.d.ts`
-// NOTE: `params` is a Promise here, so we `await` it.
-export async function GET(
-  _req: Request,
-  context: RouteContext<"/api/gallery/[kind]">
-) {
-  const { kind } = await context.params; // <- IMPORTANT: await
-  const k = (kind as string).toLowerCase() as Kind;
+export async function GET(req: Request) {
+  // Extract `[kind]` manually to avoid strict ctx typing issues
+  const { pathname } = new URL(req.url);
+  const m = pathname.match(/\/api\/gallery\/([^/]+)/);
+  const inc = (m?.[1]?.toLowerCase() || "") as IncomingKind;
 
-  if (!(k in FOLDER_ENV)) {
+  if (!(inc in ALIAS_TO_BUCKET)) {
     return Response.json(
-      { error: `Invalid kind "${kind}". Allowed: finished, repairs` },
+      { error: `Invalid kind "${inc}". Allowed: setup, repair, finished, repairs` },
       { status: 400 }
     );
   }
 
-  const folderId = FOLDER_ENV[k];
+  const bucket = ALIAS_TO_BUCKET[inc];
+  const folderId = FOLDER_ENV[bucket];
+
   if (!folderId) {
     return Response.json(
-      {
-        error: `Missing folder ID for "${k}". Set env var DRIVE_GALLERY_${k.toUpperCase()}_FOLDER_ID in Vercel.`,
-      },
+      { error: `Missing Drive folder ID for "${bucket}". Set DRIVE_GALLERY_${bucket.toUpperCase()}_FOLDER_ID in Vercel.` },
       { status: 500 }
     );
   }
 
   try {
+    // Expect listDriveImages to return an array of objects with at least `id` or `url`, and optionally `name`
     const images = await listDriveImages(folderId);
-    // listDriveImages returns [{ id, name, url }], which your Gallery component already understands
-    return Response.json({ kind: k, images });
+    return Response.json({ kind: bucket, images });
   } catch (err) {
     console.error("[gallery route]", err);
     return Response.json({ error: "Failed to load gallery" }, { status: 500 });

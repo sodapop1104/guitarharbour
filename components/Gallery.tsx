@@ -7,10 +7,10 @@ type Img = { src: string; full: string; alt: string };
 type ApiImage =
   | string
   | {
-      id?: string;         // Drive file ID
-      url?: string;        // Direct/public URL if you already have it
-      name?: string;       // Human file name from Drive
-      mimeType?: string;   // Optional
+      id?: string;       // Drive file ID
+      url?: string;      // Direct/public URL if you already have it
+      name?: string;     // Human file name from Drive
+      mimeType?: string; // Optional
     };
 
 const MAX_VISIBLE = 12;
@@ -49,6 +49,8 @@ function stripExt(name: string) {
   return name.replace(/\.[^.]+$/, "");
 }
 
+const cleanName = (s: string) => stripExt(s).replace(/[-_]+/g, " ");
+
 function normalizeToImg(item: ApiImage): Img {
   if (typeof item === "string") {
     if (isDriveId(item)) {
@@ -58,21 +60,21 @@ function normalizeToImg(item: ApiImage): Img {
     if (id) {
       return { src: driveThumbURL(id, 1200), full: driveFullURL(id), alt: "Photo" };
     }
-    return { src: item, full: item, alt: stripExt(lastSegment(item)).replace(/[-_]+/g, " ") };
+    return { src: item, full: item, alt: cleanName(lastSegment(item)) };
   }
 
   const { id, url, name } = item;
   if (id && isDriveId(id)) {
-    return { src: driveThumbURL(id, 1200), full: driveFullURL(id), alt: (name && stripExt(name)) || "Photo" };
-  }
+    return { src: driveThumbURL(id, 1200), full: driveFullURL(id), alt: name ? cleanName(name) : "Photo" };
+    }
   if (url) {
     const gotId = driveIdFromUrl(url);
     if (gotId) {
-      return { src: driveThumbURL(gotId, 1200), full: driveFullURL(gotId), alt: (name && stripExt(name)) || "Photo" };
+      return { src: driveThumbURL(gotId, 1200), full: driveFullURL(gotId), alt: name ? cleanName(name) : "Photo" };
     }
-    return { src: url, full: url, alt: (name && stripExt(name)) || stripExt(lastSegment(url)).replace(/[-_]+/g, " ") };
+    return { src: url, full: url, alt: name ? cleanName(name) : cleanName(lastSegment(url)) };
   }
-  return { src: "", full: "", alt: (name && stripExt(name)) || "Photo" };
+  return { src: "", full: "", alt: name ? cleanName(name) : "Photo" };
 }
 
 function parseGalleryHash(hash: string, hashKey: string) {
@@ -84,19 +86,24 @@ function parseGalleryHash(hash: string, hashKey: string) {
   return { type: "name" as const, value };
 }
 
-const nameKey = (img: Img) =>
-  stripExt(lastSegment(img.full || img.src)).toLowerCase();
+/** Prefer a stable Drive file ID for hash keys; fall back to filename. */
+const nameKey = (img: Img) => {
+  const id = driveIdFromUrl(img.full) || driveIdFromUrl(img.src);
+  if (id) return id.toLowerCase();
+  return stripExt(lastSegment(img.full || img.src)).toLowerCase();
+};
 
 type GalleryProps = {
+  /** API endpoint to fetch images from; should include a kind, e.g. /api/gallery/finished */
   endpoint?: string;
   hashKey?: string;
   title?: string;
 };
 
 export default function Gallery({
-  endpoint = "/api/gallery",
+  endpoint = "/api/gallery/finished",
   hashKey = "gallery",
-  title = "", // hide "GALLERY"
+  title = "", // hide "GALLERY" by default
 }: GalleryProps) {
   const [all, setAll] = useState<Img[]>([]);
   const [showAll, setShowAll] = useState(false);
@@ -113,6 +120,7 @@ export default function Gallery({
     (async () => {
       try {
         const res = await fetch(endpoint, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const images = (json.images ?? []) as ApiImage[];
         const normalized = images.map(normalizeToImg).filter((x) => x.src);
@@ -125,6 +133,11 @@ export default function Gallery({
       cancelled = true;
     };
   }, [endpoint]);
+
+  const openAt = (i: number) => {
+    setIdx(i);
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!all.length) return;
@@ -143,11 +156,6 @@ export default function Gallery({
     window.addEventListener("hashchange", openFromHash);
     return () => window.removeEventListener("hashchange", openFromHash);
   }, [all, hashKey]);
-
-  const openAt = (i: number) => {
-    setIdx(i);
-    setOpen(true);
-  };
 
   const close = useCallback(() => setOpen(false), []);
   const next = useCallback(() => setIdx((i) => (i + 1) % all.length), [all.length]);
@@ -209,7 +217,6 @@ export default function Gallery({
 
   return (
     <section className="gh-gallery" id={hashKey}>
-      {/* No heading */}
       {title ? <h2 className="gh-gallery-title">{title}</h2> : null}
 
       <div ref={gridRef} className="gh-gallery-grid">
@@ -229,7 +236,7 @@ export default function Gallery({
                 className="gh-thumb-img"
               />
             </span>
-            {/* caption removed */}
+            {/* caption intentionally hidden */}
           </button>
         ))}
       </div>
