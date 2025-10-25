@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://guitarharbour.vercel.app";
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://www.guitarharbour.com/";
   const now = new Date();
   return [
     { url: `${base}/`, lastModified: now },
